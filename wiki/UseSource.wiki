@@ -1,0 +1,12 @@
+#labels Android,Project,Application
+How to use the source code.
+
+= Introduction =
+
+The source is an Android project created with SDK_r20.
+
+
+= Details =
+
+Check out the codes.
+Create a new android project in Eclipse, then select "Create from an existing project" and select downloaded code.
