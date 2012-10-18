@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:orientation="horizontal"
+  android:layout_width="fill_parent"
+  android:layout_height="wrap_content"
+  android:layout_gravity="center"
+  android:gravity="center">
+    <ViewSwitcher android:id="@+id/action_switcher"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:inAnimation="@anim/action_switcher_in"
+        android:outAnimation="@anim/action_switcher_out">
+	    <CheckBox android:id="@+id/action_toggle_done"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:button="@drawable/ic_checkbox"
+	        android:gravity="center"
+	        android:layout_gravity="center" />
+	    <ImageView android:id="@+id/action_delete_task"
+	        android:src="@drawable/ic_delete"
+	        android:layout_width="48dip"
+	        android:layout_height="48dip"
+	        android:contentDescription="@string/delete_description"
+	        android:gravity="center"
+	        android:layout_gravity="center"
+	        android:scaleType="center" />
+    </ViewSwitcher>
+	<TextView android:id="@+id/task"
+           style="@style/task_item_text" />
+</LinearLayout>

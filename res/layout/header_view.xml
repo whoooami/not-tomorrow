@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:orientation="horizontal"
+  android:layout_width="fill_parent"
+  android:layout_height="wrap_content"
+  android:layout_gravity="center"
+  android:gravity="center"
+  android:layout_margin="5dip">
+    <EditText android:id="@+id/task_editor"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" 
+        android:hint="@string/add_hint"
+        android:drawableTop="@color/white"
+        android:drawableBottom="@color/white"
+        android:drawableLeft="@color/white"
+        android:drawableRight="@color/white"
+        android:capitalize="sentences"
+        android:inputType="textAutoCorrect" />
+</LinearLayout>

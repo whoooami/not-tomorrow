@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="task_text">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:gravity">center_vertical|clip_horizontal</item>
+    </style>
+    <style name="header_text" parent="task_text">
+        <item name="android:textColor">@color/header</item>
+        <item name="android:textSize">24sp</item>
+    </style>
+    <style name="task_item_text" parent="task_text">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+    <style name="done_task_item_text" parent="task_text">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/task_done</item>
+        <item name="android:singleLine">false</item>
+        <item name="android:lines">2</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:ellipsize">marquee</item>
+    </style>
+    <style name="history_header_text" parent="task_text">
+        <item name="android:textColor">@color/header</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+</resources>
