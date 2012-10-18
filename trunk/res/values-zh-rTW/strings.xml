@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">今日事今日畢</string>
+    <string name="add_hint">+ 添加新任務</string>
+    <string name="today">今日 &#8212; #</string>
+    <string name="tomorrow">明天 &#8212; #</string>
+    <string name="delete_description">刪除任務</string>
+    <string name="date_format" translatable="false">"EEE, MMM dd"</string>
+    <string name="task_history">任務歷史記錄</string>
+    <string name="clear_history">清除歷史記錄</string>
+    <string name="empty_history">任務歷史記錄為空。</string>
+    <string name="set_time_period">設置時間周期</string>
+    <string name="set">設置</string>
+    <string name="cancel">取消</string>
+    <string name="select_time_period">選擇一個時間周期</string>
+    <string-array name="time_period_name">
+        <item>1個星期</item>
+        <item>2個星期</item>
+        <item>3個星期</item>
+        <item>1個月</item>
+    </string-array>
+    <string name="move_to_today">移到今天</string>
+    <string name="goto_tomorrow">明天</string>
+    <string name="view_history">查看歷史記錄</string>
+    <string name="move_to_today_tip">\"#\"已經移到今日。</string>
+</resources>

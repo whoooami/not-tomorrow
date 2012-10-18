@@ -1,0 +1,240 @@
+package com.hilton.todo;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
+import android.app.Activity;
+import android.content.ContentUris;
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.graphics.Typeface;
+import android.net.Uri;
+import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.TextUtils;
+import android.text.style.StrikethroughSpan;
+import android.text.style.StyleSpan;
+import android.view.GestureDetector;
+import android.view.GestureDetector.SimpleOnGestureListener;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnKeyListener;
+import android.view.View.OnTouchListener;
+import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.CursorAdapter;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ViewSwitcher;
+
+import com.hilton.todo.Task.ProjectionIndex;
+import com.hilton.todo.Task.TaskColumns;
+
+public class TomorrowActivity extends Activity {
+    protected static final String TAG = "TomorrowActivity";
+    private static int sTaskOrder = 0;
+    private ListView mTaskList;
+    private EditText mAddTaskEditor;
+    private LayoutInflater mFactory;
+    private GestureDetector mGestureDetector;
+    
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.today_activity);
+        final TextView header = (TextView) findViewById(R.id.header);
+        final Calendar date = new GregorianCalendar();
+        date.add(Calendar.DAY_OF_YEAR, 1);
+        header.setText(getString(R.string.tomorrow).replace("#", new SimpleDateFormat(getString(R.string.date_format)).format(date.getTime())));
+        
+        mFactory = LayoutInflater.from(getApplication());
+        mTaskList = (ListView) findViewById(R.id.task_list);
+        final View headerView = mFactory.inflate(R.layout.header_view, null);
+        mTaskList.addHeaderView(headerView);
+        mAddTaskEditor = (EditText) headerView.findViewById(R.id.task_editor);
+        mAddTaskEditor.setOnKeyListener(new OnKeyListener() {
+            @Override
+            public boolean onKey(View view, int keycode, KeyEvent event) {
+        	if (keycode == KeyEvent.KEYCODE_DPAD_CENTER || keycode == KeyEvent.KEYCODE_ENTER) {
+        	    // finish editing
+        	    final InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        	    inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        	    final String text = mAddTaskEditor.getText().toString();
+        	    if (!TextUtils.isEmpty(text)) {
+        		final ContentValues values = new ContentValues(1);
+        		values.put(TaskColumns.TASK, text);
+        		values.put(TaskColumns.TYPE, Task.TYPE_TOMORROW);
+        		final Calendar tomorrow = new GregorianCalendar();
+        		tomorrow.add(Calendar.DAY_OF_YEAR, 1);
+        		tomorrow.set(Calendar.HOUR_OF_DAY, 00);
+        		tomorrow.set(Calendar.MINUTE, 00);
+        		tomorrow.set(Calendar.SECOND, ++sTaskOrder);
+        		values.put(TaskColumns.MODIFIED, tomorrow.getTimeInMillis());
+        		values.put(TaskColumns.DAY, tomorrow.get(Calendar.DAY_OF_YEAR));
+        		getContentResolver().insert(Task.CONTENT_URI, values);
+        	    }
+        	    mAddTaskEditor.setText("");
+        	}
+        	return false;
+            }
+        });
+        final Cursor cursor = getContentResolver().query(Task.CONTENT_URI, Task.PROJECTION, TaskColumns.TYPE + " = " + Task.TYPE_TOMORROW, null, null);
+        final TaskAdapter adapter = new TaskAdapter(getApplication(), cursor);
+        mTaskList.setAdapter(adapter);
+        mGestureDetector = new GestureDetector(new SwitchGestureListener());
+        mTaskList.setOnTouchListener(new OnTouchListener() {
+	    @Override
+	    public boolean onTouch(View v, MotionEvent event) {
+		return mGestureDetector.onTouchEvent(event);
+	    }
+	});
+    }
+
+    @Override
+    public void onBackPressed() {
+	super.onBackPressed();
+	setTransitionAnimation();
+    }
+
+    private void setTransitionAnimation() {
+	overridePendingTransition(R.anim.activity_leave_in, R.anim.activity_leave_out);
+    }
+    
+    private class TaskAdapter extends CursorAdapter {
+        private Cursor mCursor;
+        
+        public TaskAdapter(Context context, Cursor c) {
+            super(context, c);
+            mCursor = c;
+        }
+        
+        @Override
+        public void bindView(View view, Context context, Cursor cursor) {
+            if (view  == null) {
+                view = mFactory.inflate(R.layout.tomorrow_task_item, null);
+            }
+            final ViewSwitcher switcher = (ViewSwitcher) view.findViewById(R.id.action_switcher);
+            if (switcher.getDisplayedChild() == 1) {
+        	switcher.clearAnimation();
+        	switcher.showPrevious();
+        	switcher.clearAnimation();
+            }
+            final String taskContent = cursor.getString(ProjectionIndex.TASK);
+            final short done = cursor.getShort(ProjectionIndex.DONE);
+            final int id = cursor.getInt(ProjectionIndex.ID);
+            final ImageView move = (ImageView) view.findViewById(R.id.action_move_to_today);
+            move.setOnClickListener(new OnClickListener() {
+	        @Override
+	        public void onClick(View v) {
+	    	    final Uri uri = ContentUris.withAppendedId(Task.CONTENT_URI, id);
+	    	    final ContentValues values = new ContentValues(2);
+	    	    values.put(TaskColumns.TYPE, Task.TYPE_TODAY);
+	    	    final Calendar today = new GregorianCalendar();
+	    	    values.put(TaskColumns.MODIFIED, today.getTimeInMillis());
+	    	    values.put(TaskColumns.DAY, today.get(Calendar.DAY_OF_YEAR));
+	    	    getContentResolver().update(uri, values, null, null);
+	    	    Toast.makeText(getApplication(), getString(R.string.move_to_today_tip).replace("#", taskContent), Toast.LENGTH_SHORT).show();
+	        }
+	    });
+            view.setOnClickListener(new OnClickListener() {
+ 	        @Override
+ 	        public void onClick(View v) {
+ 	            switcher.showNext();
+ 	            if (switcher.getDisplayedChild() == 0) {
+ 	        	switcher.getInAnimation().setAnimationListener(null);
+ 	        	return;
+ 	            }
+ 	            final ImageView delete = (ImageView) v.findViewById(R.id.action_delete_task);
+ 	            delete.setOnClickListener(new OnClickListener() {
+ 		        @Override
+ 		        public void onClick(View v) {
+ 		            switcher.getInAnimation().setAnimationListener(new AnimationListener() {
+ 		        	@Override
+ 		        	public void onAnimationEnd(Animation animation) {
+ 		        	    switcher.getInAnimation().setAnimationListener(null);
+ 		        	    final Uri uri = ContentUris.withAppendedId(Task.CONTENT_URI, id);
+ 		        	    getContentResolver().delete(uri, null, null);
+ 		        	}
+ 		        	
+ 		        	@Override
+ 		        	public void onAnimationRepeat(Animation animation) {
+ 		        	}
+ 		        	
+ 		        	@Override
+ 		        	public void onAnimationStart(Animation animation) {
+ 		        	}
+ 		            });
+ 		            switcher.showPrevious();
+ 		        }
+ 		    });
+ 	        }
+ 	    });
+            view.setOnTouchListener(new OnTouchListener() {
+	        @Override
+	        public boolean onTouch(View v, MotionEvent event) {
+	            return mGestureDetector.onTouchEvent(event);
+	        }
+	    });
+            TextView task = (TextView) view.findViewById(R.id.task);
+            if (done != 0) {
+        	final Spannable style = new SpannableString(taskContent);
+        	style.setSpan(new StrikethroughSpan(), 0, taskContent.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+        	style.setSpan(new StyleSpan(Typeface.ITALIC) , 0, taskContent.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+        	task.setText(style);
+        	task.setTextAppearance(getApplication(), R.style.done_task_item_text);
+            } else {
+        	task.setText(taskContent);
+        	task.setTextAppearance(getApplication(), R.style.task_item_text);
+            }
+        }
+
+        @Override
+        public View newView(Context context, Cursor cursor, ViewGroup parent) {
+            View view = mFactory.inflate(R.layout.tomorrow_task_item, null);
+            return view;
+        }
+        
+        @Override
+        public void onContentChanged() {
+            mCursor.requery();
+        }
+    }
+    
+    private class SwitchGestureListener extends SimpleOnGestureListener {
+	private boolean mGestureDetected;
+	
+	public SwitchGestureListener() {
+	    mGestureDetected = false;
+	}
+	
+	@Override
+	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+	    if (mGestureDetected) {
+		return false;
+	    }
+            if (distanceY*distanceY > distanceX*distanceX) {
+                return false;
+            }
+	    if ((distanceY > -2 || distanceY < 2) && distanceX < -10) {
+		mGestureDetected = true;
+		finish();
+		setTransitionAnimation();
+	    } else {
+		mGestureDetected = false;
+	    }
+	    return mGestureDetected;
+	}
+	
+    }
+}

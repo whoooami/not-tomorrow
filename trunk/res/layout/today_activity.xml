@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/background"
+    android:orientation="vertical"
+    android:paddingBottom="15dip"
+    android:paddingLeft="12dip"
+    android:paddingRight="12dip"
+    android:paddingTop="30dip" >
+    <TextView
+        android:id="@+id/header"
+        style="@style/header_text"
+        android:layout_marginLeft="5dip"
+        android:layout_gravity="left" />
+    <TextView android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:background="@drawable/line" />
+    <com.hilton.todo.TaskListView
+        android:id="@+id/task_list"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:divider="@color/divider"
+        android:dividerHeight="0.6dip"
+        android:clickable="true"
+        android:footerDividersEnabled="true"
+        android:headerDividersEnabled="true" />
+</LinearLayout>
