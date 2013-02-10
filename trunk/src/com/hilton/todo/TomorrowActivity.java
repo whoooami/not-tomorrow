@@ -5,9 +5,11 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -30,6 +32,9 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.CursorAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -48,6 +53,7 @@ public class TomorrowActivity extends Activity {
     private EditText mAddTaskEditor;
     private LayoutInflater mFactory;
     private GestureDetector mGestureDetector;
+    protected AlertDialog mDialogEditTask;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -99,6 +105,66 @@ public class TomorrowActivity extends Activity {
 		return mGestureDetector.onTouchEvent(event);
 	    }
 	});
+        mTaskList.setOnItemLongClickListener(new OnItemLongClickListener() {
+	    @Override
+	    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+		final Uri uri = ContentUris.withAppendedId(Task.CONTENT_URI, id);
+		final View textEntryView = mFactory.inflate(R.layout.dialog_edit_task, null);
+		mDialogEditTask = new AlertDialog.Builder(TomorrowActivity.this)
+		.setIcon(android.R.drawable.ic_dialog_alert)
+		.setTitle(R.string.dialog_edit_title)
+		.setView(textEntryView)
+		.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+		    public void onClick(DialogInterface dialog, int whichButton) {
+			final EditText box = (EditText) mDialogEditTask.findViewById(R.id.edit_box);
+			final ContentValues cv = new ContentValues();
+			cv.put(TaskColumns.TASK, box.getText().toString());
+			getContentResolver().update(uri, cv, null, null);
+		    }
+		})
+		.setNegativeButton(android.R.string.cancel, null)
+		.create();
+		mDialogEditTask.show();
+		EditText box = (EditText) mDialogEditTask.findViewById(R.id.edit_box);
+		final Cursor item = (Cursor) parent.getItemAtPosition(position);
+		box.setText(item.getString(ProjectionIndex.TASK));
+		return true;
+	    }
+        });
+        mTaskList.setOnItemClickListener(new OnItemClickListener() {
+	    @Override
+	    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+		final Uri uri = ContentUris.withAppendedId(Task.CONTENT_URI, id);
+		final ViewSwitcher switcher = (ViewSwitcher) view.findViewById(R.id.action_switcher);
+		switcher.showNext();
+		if (switcher.getDisplayedChild() == 0) {
+		    switcher.getInAnimation().setAnimationListener(null);
+		    return;
+		}
+		final ImageView delete = (ImageView) view.findViewById(R.id.action_delete_task);
+		delete.setOnClickListener(new OnClickListener() {
+		    @Override
+		    public void onClick(View v) {
+			switcher.getInAnimation().setAnimationListener(new AnimationListener() {
+			    @Override
+			    public void onAnimationEnd(Animation animation) {
+				switcher.getInAnimation().setAnimationListener(null);
+				getContentResolver().delete(uri, null, null);
+			    }
+
+			    @Override
+			    public void onAnimationRepeat(Animation animation) {
+			    }
+
+			    @Override
+			    public void onAnimationStart(Animation animation) {
+			    }
+			});
+			switcher.showPrevious();
+		    }
+		});
+	    }
+        });
     }
 
     @Override
@@ -112,14 +178,11 @@ public class TomorrowActivity extends Activity {
     }
     
     private class TaskAdapter extends CursorAdapter {
-        private Cursor mCursor;
-        
         public TaskAdapter(Context context, Cursor c) {
             super(context, c);
-            mCursor = c;
         }
         
-        @Override
+	@Override
         public void bindView(View view, Context context, Cursor cursor) {
             if (view  == null) {
                 view = mFactory.inflate(R.layout.tomorrow_task_item, null);
@@ -133,11 +196,11 @@ public class TomorrowActivity extends Activity {
             final String taskContent = cursor.getString(ProjectionIndex.TASK);
             final short done = cursor.getShort(ProjectionIndex.DONE);
             final int id = cursor.getInt(ProjectionIndex.ID);
+            final Uri uri = ContentUris.withAppendedId(Task.CONTENT_URI, id);
             final ImageView move = (ImageView) view.findViewById(R.id.action_move_to_today);
             move.setOnClickListener(new OnClickListener() {
 	        @Override
 	        public void onClick(View v) {
-	    	    final Uri uri = ContentUris.withAppendedId(Task.CONTENT_URI, id);
 	    	    final ContentValues values = new ContentValues(2);
 	    	    values.put(TaskColumns.TYPE, Task.TYPE_TODAY);
 	    	    final Calendar today = new GregorianCalendar();
@@ -147,39 +210,6 @@ public class TomorrowActivity extends Activity {
 	    	    Toast.makeText(getApplication(), getString(R.string.move_to_today_tip).replace("#", taskContent), Toast.LENGTH_SHORT).show();
 	        }
 	    });
-            view.setOnClickListener(new OnClickListener() {
- 	        @Override
- 	        public void onClick(View v) {
- 	            switcher.showNext();
- 	            if (switcher.getDisplayedChild() == 0) {
- 	        	switcher.getInAnimation().setAnimationListener(null);
- 	        	return;
- 	            }
- 	            final ImageView delete = (ImageView) v.findViewById(R.id.action_delete_task);
- 	            delete.setOnClickListener(new OnClickListener() {
- 		        @Override
- 		        public void onClick(View v) {
- 		            switcher.getInAnimation().setAnimationListener(new AnimationListener() {
- 		        	@Override
- 		        	public void onAnimationEnd(Animation animation) {
- 		        	    switcher.getInAnimation().setAnimationListener(null);
- 		        	    final Uri uri = ContentUris.withAppendedId(Task.CONTENT_URI, id);
- 		        	    getContentResolver().delete(uri, null, null);
- 		        	}
- 		        	
- 		        	@Override
- 		        	public void onAnimationRepeat(Animation animation) {
- 		        	}
- 		        	
- 		        	@Override
- 		        	public void onAnimationStart(Animation animation) {
- 		        	}
- 		            });
- 		            switcher.showPrevious();
- 		        }
- 		    });
- 	        }
- 	    });
             view.setOnTouchListener(new OnTouchListener() {
 	        @Override
 	        public boolean onTouch(View v, MotionEvent event) {
@@ -203,11 +233,6 @@ public class TomorrowActivity extends Activity {
         public View newView(Context context, Cursor cursor, ViewGroup parent) {
             View view = mFactory.inflate(R.layout.tomorrow_task_item, null);
             return view;
-        }
-        
-        @Override
-        public void onContentChanged() {
-            mCursor.requery();
         }
     }
     

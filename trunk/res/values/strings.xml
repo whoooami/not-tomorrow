@@ -24,4 +24,5 @@
     <string name="view_history">View history</string>
     <string name="move_to_today_tip">\"#\" is moved to today.</string>
     <string name="move_to_tomorrow_tip">\"#\" is moved to tomorrow.</string>
+    <string name="dialog_edit_title">Edit task</string>
 </resources>
