@@ -2,10 +2,14 @@ package com.hilton.todo;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import android.app.AlertDialog;
 import android.app.ExpandableListActivity;
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -15,6 +19,7 @@ import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -30,6 +35,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
+import android.widget.ImageView;
+import android.widget.Toast;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 
@@ -234,11 +241,12 @@ public class TaskHistoryActivity extends ExpandableListActivity {
             return mTasks.get(groupPosition).size();
         }
 
-        public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+        public View getChildView(final int groupPosition, final int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
             if (convertView == null) {
         	convertView = mFactory.inflate(R.layout.history_item, null);
             }
-            TextView textView = (TextView) convertView;
+            TextView textView = (TextView) convertView.findViewById(R.id.history_task_text);
+            final ImageView pull = (ImageView) convertView.findViewById(R.id.history_move_to_today);
             final TaskItem child = getChild(groupPosition, childPosition);
             final String taskContent = child.mTaskLabel;
             if (child.isFinished()) {
@@ -247,11 +255,29 @@ public class TaskHistoryActivity extends ExpandableListActivity {
         	style.setSpan(new StyleSpan(Typeface.ITALIC) , 0, taskContent.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         	textView.setText(style);
         	textView.setTextAppearance(getApplication(), R.style.done_task_item_text);
+        	pull.setVisibility(View.GONE);
             } else {
         	textView.setText(taskContent);
         	textView.setTextAppearance(getApplication(), R.style.task_item_text);
+        	pull.setVisibility(View.VISIBLE);
+        	pull.setOnClickListener(new View.OnClickListener() {
+		    @Override
+		    public void onClick(View v) {
+			final Uri uri = ContentUris.withAppendedId(
+				Task.CONTENT_URI, getChildId(groupPosition, childPosition));
+			final ContentValues values = new ContentValues(2);
+			values.put(TaskColumns.TYPE, Task.TYPE_TODAY);
+			final Calendar today = new GregorianCalendar();
+			values.put(TaskColumns.MODIFIED,
+				today.getTimeInMillis());
+			values.put(TaskColumns.DAY,
+				today.get(Calendar.DAY_OF_YEAR));
+			getContentResolver().update(uri, values, null, null);
+			Toast.makeText(getApplication(), getString(R.string.move_to_today_tip).replace("#", taskContent), Toast.LENGTH_SHORT).show();			
+		    }
+		});
             }
-            return textView;
+            return convertView;
         }
 
         public TaskItem getGroup(int groupPosition) {

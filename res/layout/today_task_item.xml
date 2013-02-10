@@ -30,4 +30,12 @@
     </ViewSwitcher>
 	<TextView android:id="@+id/task"
            style="@style/task_item_text" />
+	<ImageView android:id="@+id/push_to_tomorrow"
+	    android:layout_width="48dip"
+	    android:layout_height="48dip"
+	    android:src="@drawable/ic_push"
+	    android:contentDescription="push to tomorrow"
+        android:scaleType="center"
+        android:gravity="center"
+        android:layout_gravity="center" />
 </LinearLayout>

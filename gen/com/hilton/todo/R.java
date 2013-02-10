@@ -44,20 +44,26 @@ public final class R {
         public static final int ic_pull_normal=0x7f02000a;
         public static final int ic_pull_nornal=0x7f02000b;
         public static final int ic_pull_pressed=0x7f02000c;
-        public static final int ic_unchcked_normal=0x7f02000d;
-        public static final int ic_unchecked_normal=0x7f02000e;
-        public static final int ic_unchecked_pressed=0x7f02000f;
-        public static final int line=0x7f020010;
+        public static final int ic_push=0x7f02000d;
+        public static final int ic_push_normal=0x7f02000e;
+        public static final int ic_push_pressed=0x7f02000f;
+        public static final int ic_unchcked_normal=0x7f020010;
+        public static final int ic_unchecked_normal=0x7f020011;
+        public static final int ic_unchecked_pressed=0x7f020012;
+        public static final int line=0x7f020013;
     }
     public static final class id {
-        public static final int action_delete_task=0x7f0a0005;
-        public static final int action_move_to_today=0x7f0a0007;
-        public static final int action_switcher=0x7f0a0003;
-        public static final int action_toggle_done=0x7f0a0004;
-        public static final int header=0x7f0a0001;
-        public static final int task=0x7f0a0006;
+        public static final int action_delete_task=0x7f0a0007;
+        public static final int action_move_to_today=0x7f0a000a;
+        public static final int action_switcher=0x7f0a0005;
+        public static final int action_toggle_done=0x7f0a0006;
+        public static final int header=0x7f0a0003;
+        public static final int history_move_to_today=0x7f0a0001;
+        public static final int history_task_text=0x7f0a0002;
+        public static final int push_to_tomorrow=0x7f0a0009;
+        public static final int task=0x7f0a0008;
         public static final int task_editor=0x7f0a0000;
-        public static final int task_list=0x7f0a0002;
+        public static final int task_list=0x7f0a0004;
     }
     public static final class integer {
         public static final int activity_animation_duration=0x7f060001;
@@ -83,6 +89,7 @@ public final class R {
         public static final int goto_tomorrow=0x7f08000e;
         public static final int move_to_today=0x7f08000d;
         public static final int move_to_today_tip=0x7f080010;
+        public static final int move_to_tomorrow_tip=0x7f080011;
         public static final int select_time_period=0x7f08000c;
         public static final int set=0x7f08000a;
         public static final int set_time_period=0x7f080009;
