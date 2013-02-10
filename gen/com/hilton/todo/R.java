@@ -53,30 +53,32 @@ public final class R {
         public static final int line=0x7f020013;
     }
     public static final class id {
-        public static final int action_delete_task=0x7f0a0007;
-        public static final int action_move_to_today=0x7f0a000a;
-        public static final int action_switcher=0x7f0a0005;
-        public static final int action_toggle_done=0x7f0a0006;
-        public static final int header=0x7f0a0003;
-        public static final int history_move_to_today=0x7f0a0001;
-        public static final int history_task_text=0x7f0a0002;
-        public static final int push_to_tomorrow=0x7f0a0009;
-        public static final int task=0x7f0a0008;
-        public static final int task_editor=0x7f0a0000;
-        public static final int task_list=0x7f0a0004;
+        public static final int action_delete_task=0x7f0a0008;
+        public static final int action_move_to_today=0x7f0a000b;
+        public static final int action_switcher=0x7f0a0006;
+        public static final int action_toggle_done=0x7f0a0007;
+        public static final int edit_box=0x7f0a0000;
+        public static final int header=0x7f0a0004;
+        public static final int history_move_to_today=0x7f0a0002;
+        public static final int history_task_text=0x7f0a0003;
+        public static final int push_to_tomorrow=0x7f0a000a;
+        public static final int task=0x7f0a0009;
+        public static final int task_editor=0x7f0a0001;
+        public static final int task_list=0x7f0a0005;
     }
     public static final class integer {
         public static final int activity_animation_duration=0x7f060001;
         public static final int animation_duration=0x7f060000;
     }
     public static final class layout {
-        public static final int empty_history=0x7f030000;
-        public static final int header_view=0x7f030001;
-        public static final int history_header=0x7f030002;
-        public static final int history_item=0x7f030003;
-        public static final int today_activity=0x7f030004;
-        public static final int today_task_item=0x7f030005;
-        public static final int tomorrow_task_item=0x7f030006;
+        public static final int dialog_edit_task=0x7f030000;
+        public static final int empty_history=0x7f030001;
+        public static final int header_view=0x7f030002;
+        public static final int history_header=0x7f030003;
+        public static final int history_item=0x7f030004;
+        public static final int today_activity=0x7f030005;
+        public static final int today_task_item=0x7f030006;
+        public static final int tomorrow_task_item=0x7f030007;
     }
     public static final class string {
         public static final int add_hint=0x7f080001;
@@ -85,6 +87,7 @@ public final class R {
         public static final int clear_history=0x7f080007;
         public static final int date_format=0x7f080005;
         public static final int delete_description=0x7f080004;
+        public static final int dialog_edit_title=0x7f080012;
         public static final int empty_history=0x7f080008;
         public static final int goto_tomorrow=0x7f08000e;
         public static final int move_to_today=0x7f08000d;

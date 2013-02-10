@@ -5,9 +5,12 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Typeface;
@@ -28,6 +31,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
+import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -56,6 +60,7 @@ public class TodayActivity extends Activity {
     private LayoutInflater mFactory;
     private GestureDetector mGestureDetector;
     private SwitchGestureListener mSwitchGestureListener;
+    protected Dialog mDialogEditTask;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -93,7 +98,7 @@ public class TodayActivity extends Activity {
         final TaskAdapter adapter = new TaskAdapter(getApplication(), cursor);
         mTaskList.setAdapter(adapter);
         mSwitchGestureListener = new SwitchGestureListener();
-        mGestureDetector = new GestureDetector(getApplication(), mSwitchGestureListener);
+        mGestureDetector = new GestureDetector(mSwitchGestureListener);
         mTaskList.setOnTouchListener(new OnTouchListener() {
 	    @Override
 	    public boolean onTouch(View v, MotionEvent event) {
@@ -104,7 +109,7 @@ public class TodayActivity extends Activity {
     
     @Override
     public void onResume() {
-	super.onRestart();
+	super.onResume();
 	mSwitchGestureListener.reset();
     }
     
@@ -140,11 +145,8 @@ public class TodayActivity extends Activity {
     }
     
     private class TaskAdapter extends CursorAdapter {
-        private Cursor mCursor;
-        
         public TaskAdapter(Context context, Cursor c) {
             super(context, c);
-            mCursor = c;
         }
         
         @Override
@@ -174,6 +176,8 @@ public class TodayActivity extends Activity {
             final CheckBox toggle = (CheckBox) view.findViewById(R.id.action_toggle_done);
             final short done = cursor.getShort(ProjectionIndex.DONE);
             final int id = cursor.getInt(ProjectionIndex.ID);
+            final Uri uri = ContentUris.withAppendedId(Task.CONTENT_URI, id);
+            final String taskContent = cursor.getString(ProjectionIndex.TASK);
             /*
              * 1. bindView will be called every time refresh the UI, so onCheckedChangedListener will be changed to the last one set.
              * 2. setChecked would invoke onCheckedChanged.
@@ -186,7 +190,6 @@ public class TodayActivity extends Activity {
             toggle.setOnCheckedChangeListener(new OnCheckedChangeListener() {
         	@Override
         	public void onCheckedChanged(CompoundButton view, boolean checked) {
-        	    final Uri uri = ContentUris.withAppendedId(Task.CONTENT_URI, id);
         	    final ContentValues values = new ContentValues(1);
         	    values.put(TaskColumns.DONE, checked ? 1 : 0);
         	    getContentResolver().update(uri, values, null, null);
@@ -226,6 +229,33 @@ public class TodayActivity extends Activity {
 		    });
 	        }
 	    });
+            view.setOnLongClickListener(new OnLongClickListener() {
+		@Override
+		public boolean onLongClick(View v) {
+		    if (done != 0) {
+			return true;
+		    }
+		    final View textEntryView = mFactory.inflate(R.layout.dialog_edit_task, null);
+		    mDialogEditTask = new AlertDialog.Builder(TodayActivity.this)
+		    .setIcon(android.R.drawable.ic_dialog_alert)
+		    .setTitle(R.string.dialog_edit_title)
+		    .setView(textEntryView)
+		    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+			    final EditText box = (EditText) mDialogEditTask.findViewById(R.id.edit_box);
+			    final ContentValues cv = new ContentValues();
+			    cv.put(TaskColumns.TASK, box.getText().toString());
+			    getContentResolver().update(uri, cv, null, null);
+			}
+		    })
+		    .setNegativeButton(android.R.string.cancel, null)
+		    .create();
+		    mDialogEditTask.show();
+		    EditText box = (EditText) mDialogEditTask.findViewById(R.id.edit_box);
+		    box.setText(taskContent);
+		    return true;
+		}
+            });
             view.setOnTouchListener(new OnTouchListener() {
 	        @Override
 	        public boolean onTouch(View v, MotionEvent event) {
@@ -233,7 +263,7 @@ public class TodayActivity extends Activity {
 	        }
 	    });
             TextView task = (TextView) view.findViewById(R.id.task);
-            final String taskContent = cursor.getString(ProjectionIndex.TASK);
+
             if (done != 0) {
         	final Spannable style = new SpannableString(taskContent);
         	style.setSpan(new StrikethroughSpan(), 0, taskContent.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
@@ -265,11 +295,6 @@ public class TodayActivity extends Activity {
         public View newView(Context context, Cursor cursor, ViewGroup parent) {
             View view = mFactory.inflate(R.layout.today_task_item, null);
             return view;
-        }
-        
-        @Override
-        public void onContentChanged() {
-            mCursor.requery();
         }
     }
     

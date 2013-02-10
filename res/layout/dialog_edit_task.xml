@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:padding="5dip">
+	<EditText 
+	    android:id="@+id/edit_box"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_gravity="center_vertical"
+	    android:capitalize="sentences"
+	    android:drawableBottom="@color/white"
+	    android:drawableLeft="@color/white"
+	    android:drawableRight="@color/white"
+	    android:drawableTop="@color/white"
+	    android:gravity="center_vertical"
+	    android:inputType="textAutoCorrect" />
+</LinearLayout>
