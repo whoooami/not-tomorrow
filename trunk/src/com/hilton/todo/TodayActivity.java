@@ -41,6 +41,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import com.hilton.todo.Task.ProjectionIndex;
@@ -243,6 +244,21 @@ public class TodayActivity extends Activity {
         	task.setText(taskContent);
         	task.setTextAppearance(getApplication(), R.style.task_item_text);
             }
+            final ImageView push = (ImageView) view.findViewById(R.id.push_to_tomorrow);
+            push.setOnClickListener(new OnClickListener() {
+	        @Override
+	        public void onClick(View v) {
+	    	    final Uri uri = ContentUris.withAppendedId(Task.CONTENT_URI, id);
+	    	    final ContentValues values = new ContentValues(2);
+	    	    values.put(TaskColumns.TYPE, Task.TYPE_TOMORROW);
+	    	    final Calendar today = new GregorianCalendar();
+	    	    today.add(Calendar.DAY_OF_YEAR, 1);
+	    	    values.put(TaskColumns.MODIFIED, today.getTimeInMillis());
+	    	    values.put(TaskColumns.DAY, today.get(Calendar.DAY_OF_YEAR));
+	    	    getContentResolver().update(uri, values, null, null);
+	    	    Toast.makeText(getApplication(), getString(R.string.move_to_tomorrow_tip).replace("#", taskContent), Toast.LENGTH_SHORT).show();
+	        }
+	    });
         }
 
         @Override

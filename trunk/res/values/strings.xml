@@ -23,4 +23,5 @@
     <string name="goto_tomorrow">Tomorrow</string>
     <string name="view_history">View history</string>
     <string name="move_to_today_tip">\"#\" is moved to today.</string>
+    <string name="move_to_tomorrow_tip">\"#\" is moved to tomorrow.</string>
 </resources>

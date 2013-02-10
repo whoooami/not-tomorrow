@@ -16,5 +16,7 @@
         android:drawableLeft="@color/white"
         android:drawableRight="@color/white"
         android:capitalize="sentences"
-        android:inputType="textAutoCorrect" />
+        android:inputType="textAutoCorrect" 
+        android:gravity="center_vertical"
+        android:layout_gravity="center_vertical"/>
 </LinearLayout>
