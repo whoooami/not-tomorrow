@@ -11,6 +11,7 @@ public class Task {
         TaskColumns.TYPE,
         TaskColumns.MODIFIED,
         TaskColumns.DAY,
+//        TaskColumns.PRIORITY,
     };
     
     public static final class ProjectionIndex {
@@ -20,6 +21,7 @@ public class Task {
         public static final int TYPE = 3;
         public static final int MODIFIED = 4;
         public static final int DAY = 5;
+//        public static final int PRIORITY = 6;
     }
     
     public static class TaskColumns {
@@ -32,9 +34,19 @@ public class Task {
         /** the day of the year on which task is created */
         // TODO: there is a bug, if we are at end of a year, day-of-year is not reliable any more
         public static final String DAY = "day";
+        public static final String PRIORITY = "priority";
     }
     
     public static final int TYPE_TODAY = 1;
     public static final int TYPE_TOMORROW = 2;
     public static final int TYPE_HISTORY = 3;
+    
+    private static int sPriority = 0;
+    public static int getPriority() {
+	return ++sPriority;
+    }
+    
+    public static void resetPriority() {
+	sPriority = 0;
+    }
 }

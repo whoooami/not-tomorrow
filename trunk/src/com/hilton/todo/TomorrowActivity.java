@@ -19,6 +19,7 @@ import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.KeyEvent;
@@ -27,6 +28,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
+import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -38,18 +40,20 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.CursorAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import com.hilton.todo.Task.ProjectionIndex;
 import com.hilton.todo.Task.TaskColumns;
+import com.hilton.todo.TaskListView.DragListener;
+import com.hilton.todo.TaskListView.DropListener;
+import com.hilton.todo.TaskListView.RemoveListener;
 
 public class TomorrowActivity extends Activity {
     protected static final String TAG = "TomorrowActivity";
     private static int sTaskOrder = 0;
-    private ListView mTaskList;
+    private TaskListView mTaskList;
     private EditText mAddTaskEditor;
     private LayoutInflater mFactory;
     private GestureDetector mGestureDetector;
@@ -65,7 +69,7 @@ public class TomorrowActivity extends Activity {
         header.setText(getString(R.string.tomorrow).replace("#", new SimpleDateFormat(getString(R.string.date_format)).format(date.getTime())));
         
         mFactory = LayoutInflater.from(getApplication());
-        mTaskList = (ListView) findViewById(R.id.task_list);
+        mTaskList = (TaskListView) findViewById(R.id.task_list);
         final View headerView = mFactory.inflate(R.layout.header_view, null);
         mTaskList.addHeaderView(headerView);
         mAddTaskEditor = (EditText) headerView.findViewById(R.id.task_editor);
@@ -105,66 +109,9 @@ public class TomorrowActivity extends Activity {
 		return mGestureDetector.onTouchEvent(event);
 	    }
 	});
-        mTaskList.setOnItemLongClickListener(new OnItemLongClickListener() {
-	    @Override
-	    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-		final Uri uri = ContentUris.withAppendedId(Task.CONTENT_URI, id);
-		final View textEntryView = mFactory.inflate(R.layout.dialog_edit_task, null);
-		mDialogEditTask = new AlertDialog.Builder(TomorrowActivity.this)
-		.setIcon(android.R.drawable.ic_dialog_alert)
-		.setTitle(R.string.dialog_edit_title)
-		.setView(textEntryView)
-		.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int whichButton) {
-			final EditText box = (EditText) mDialogEditTask.findViewById(R.id.edit_box);
-			final ContentValues cv = new ContentValues();
-			cv.put(TaskColumns.TASK, box.getText().toString());
-			getContentResolver().update(uri, cv, null, null);
-		    }
-		})
-		.setNegativeButton(android.R.string.cancel, null)
-		.create();
-		mDialogEditTask.show();
-		EditText box = (EditText) mDialogEditTask.findViewById(R.id.edit_box);
-		final Cursor item = (Cursor) parent.getItemAtPosition(position);
-		box.setText(item.getString(ProjectionIndex.TASK));
-		return true;
-	    }
-        });
-        mTaskList.setOnItemClickListener(new OnItemClickListener() {
-	    @Override
-	    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		final Uri uri = ContentUris.withAppendedId(Task.CONTENT_URI, id);
-		final ViewSwitcher switcher = (ViewSwitcher) view.findViewById(R.id.action_switcher);
-		switcher.showNext();
-		if (switcher.getDisplayedChild() == 0) {
-		    switcher.getInAnimation().setAnimationListener(null);
-		    return;
-		}
-		final ImageView delete = (ImageView) view.findViewById(R.id.action_delete_task);
-		delete.setOnClickListener(new OnClickListener() {
-		    @Override
-		    public void onClick(View v) {
-			switcher.getInAnimation().setAnimationListener(new AnimationListener() {
-			    @Override
-			    public void onAnimationEnd(Animation animation) {
-				switcher.getInAnimation().setAnimationListener(null);
-				getContentResolver().delete(uri, null, null);
-			    }
-
-			    @Override
-			    public void onAnimationRepeat(Animation animation) {
-			    }
-
-			    @Override
-			    public void onAnimationStart(Animation animation) {
-			    }
-			});
-			switcher.showPrevious();
-		    }
-		});
-	    }
-        });
+        mTaskList.setDragListener(mDragListener);
+        mTaskList.setDropListener(mDropListener);
+        mTaskList.setRemoveListener(mRemoveListener);
     }
 
     @Override
@@ -178,8 +125,10 @@ public class TomorrowActivity extends Activity {
     }
     
     private class TaskAdapter extends CursorAdapter {
+//	private Cursor mCursor;
         public TaskAdapter(Context context, Cursor c) {
             super(context, c);
+//            mCursor = c;
         }
         
 	@Override
@@ -187,6 +136,7 @@ public class TomorrowActivity extends Activity {
             if (view  == null) {
                 view = mFactory.inflate(R.layout.tomorrow_task_item, null);
             }
+            Log.e(TAG, "bind view, lalala");
             final ViewSwitcher switcher = (ViewSwitcher) view.findViewById(R.id.action_switcher);
             if (switcher.getDisplayedChild() == 1) {
         	switcher.clearAnimation();
@@ -210,6 +160,62 @@ public class TomorrowActivity extends Activity {
 	    	    Toast.makeText(getApplication(), getString(R.string.move_to_today_tip).replace("#", taskContent), Toast.LENGTH_SHORT).show();
 	        }
 	    });
+//            view.setOnClickListener(new OnClickListener() {
+//		@Override
+//		public void onClick(View v) {
+//		    switcher.showNext();
+//		    if (switcher.getDisplayedChild() == 0) {
+//			switcher.getInAnimation().setAnimationListener(null);
+//			return;
+//		    }
+//		    final ImageView delete = (ImageView) v.findViewById(R.id.action_delete_task);
+//		    delete.setOnClickListener(new OnClickListener() {
+//			@Override
+//			public void onClick(View v) {
+//			    switcher.getInAnimation().setAnimationListener(new AnimationListener() {
+//				@Override
+//				public void onAnimationEnd(Animation animation) {
+//				    switcher.getInAnimation().setAnimationListener(null);
+//				    getContentResolver().delete(uri, null, null);
+//				}
+//
+//				@Override
+//				public void onAnimationRepeat(Animation animation) {
+//				}
+//
+//				@Override
+//				public void onAnimationStart(Animation animation) {
+//				}
+//			    });
+//			    switcher.showPrevious();
+//			}
+//		    });
+//		}
+//            });
+//            view.setOnLongClickListener(new OnLongClickListener() {
+//        	@Override
+//        	public boolean onLongClick(View v) {
+//        	    final View textEntryView = mFactory.inflate(R.layout.dialog_edit_task, null);
+//        	    mDialogEditTask = new AlertDialog.Builder(TomorrowActivity.this)
+//        	    .setIcon(android.R.drawable.ic_dialog_alert)
+//        	    .setTitle(R.string.dialog_edit_title)
+//        	    .setView(textEntryView)
+//        	    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+//        		public void onClick(DialogInterface dialog, int whichButton) {
+//        		    final EditText box = (EditText) mDialogEditTask.findViewById(R.id.edit_box);
+//        		    final ContentValues cv = new ContentValues();
+//        		    cv.put(TaskColumns.TASK, box.getText().toString());
+//        		    getContentResolver().update(uri, cv, null, null);
+//        		}
+//        	    })
+//        	    .setNegativeButton(android.R.string.cancel, null)
+//        	    .create();
+//        	    mDialogEditTask.show();
+//        	    EditText box = (EditText) mDialogEditTask.findViewById(R.id.edit_box);
+//        	    box.setText(taskContent);
+//        	    return true;
+//        	}
+//            });
             view.setOnTouchListener(new OnTouchListener() {
 	        @Override
 	        public boolean onTouch(View v, MotionEvent event) {
@@ -217,16 +223,8 @@ public class TomorrowActivity extends Activity {
 	        }
 	    });
             TextView task = (TextView) view.findViewById(R.id.task);
-            if (done != 0) {
-        	final Spannable style = new SpannableString(taskContent);
-        	style.setSpan(new StrikethroughSpan(), 0, taskContent.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-        	style.setSpan(new StyleSpan(Typeface.ITALIC) , 0, taskContent.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-        	task.setText(style);
-        	task.setTextAppearance(getApplication(), R.style.done_task_item_text);
-            } else {
-        	task.setText(taskContent);
-        	task.setTextAppearance(getApplication(), R.style.task_item_text);
-            }
+            task.setText(taskContent);
+            task.setTextAppearance(getApplication(), R.style.task_item_text);
         }
 
         @Override
@@ -234,6 +232,20 @@ public class TomorrowActivity extends Activity {
             View view = mFactory.inflate(R.layout.tomorrow_task_item, null);
             return view;
         }
+
+//	@Override
+//	public Cursor getItem(int position) {
+//	    mCursor.moveToPosition(position);
+//	    return mCursor;
+//	}
+//
+//	@Override
+//	public long getItemId(int position) {
+//	    mCursor.moveToPosition(position);
+//	    return mCursor.getLong(ProjectionIndex.ID);
+//	}
+//        
+        
     }
     
     private class SwitchGestureListener extends SimpleOnGestureListener {
@@ -262,4 +274,21 @@ public class TomorrowActivity extends Activity {
 	}
 	
     }
+    
+    private DropListener mDropListener = new DropListener() {
+	public void drop(int from, int to) {
+	    Log.e(TAG, "fucking drop from " + from + " to "  + to);
+	}
+    };
+    private DragListener mDragListener = new DragListener() {
+	@Override
+	public void drag(int from, int to) {
+	    Log.e(TAG, "fucking drag from " + from + " to "  + to);
+	}
+    };
+    private RemoveListener mRemoveListener = new RemoveListener() {
+	public void remove(int which) {
+	    Log.e(TAG, "fucking remove " + which);
+	}
+    };
 }
