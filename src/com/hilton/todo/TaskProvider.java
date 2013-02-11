@@ -15,6 +15,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.hilton.todo.Task.TaskColumns;
 
@@ -28,7 +29,7 @@ public class TaskProvider extends ContentProvider {
     
     private static final UriMatcher URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
     private static final String DATABASE_NAME = "todo.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     private static final String TAG = "TaskProvider";
     static {
         URI_MATCHER.addURI(AUTHORITY, TABLE_NAME, URI_MATCH_TASK);
