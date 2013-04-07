@@ -5,7 +5,6 @@
     <string name="today">今日 &#8212; #</string>
     <string name="tomorrow">明天 &#8212; #</string>
     <string name="delete_description">刪除任務</string>
-    <string name="date_format" translatable="false">"EEE, MMM dd"</string>
     <string name="task_history">任務歷史記錄</string>
     <string name="clear_history">清除歷史記錄</string>
     <string name="empty_history">任務歷史記錄為空。</string>
