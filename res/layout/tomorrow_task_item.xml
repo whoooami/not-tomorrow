@@ -43,5 +43,5 @@
         android:scaleType="center"
         android:layout_gravity="center"
         android:gravity="center"
-        android:src="@drawable/tasklist_tile_drag"/>
+        android:src="@drawable/ic_push"/>
 </LinearLayout>
