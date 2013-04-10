@@ -38,4 +38,13 @@
         android:scaleType="center"
         android:gravity="center"
         android:layout_gravity="center" />
+	<ImageView android:id="@+id/dragging"
+        android:layout_width="48dip"
+        android:layout_height="48dip"
+        android:contentDescription="dragging"
+        android:scaleType="center"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:visibility="gone"
+        android:src="@drawable/ic_push"/>
 </LinearLayout>

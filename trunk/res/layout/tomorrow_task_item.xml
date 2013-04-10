@@ -36,12 +36,5 @@
 
     <TextView android:id="@+id/task"
            style="@style/task_item_text" />
-    <ImageView android:id="@+id/dragging"
-        android:layout_width="48dip"
-        android:layout_height="48dip"
-        android:contentDescription="dragging"
-        android:scaleType="center"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:src="@drawable/ic_push"/>
+
 </LinearLayout>
