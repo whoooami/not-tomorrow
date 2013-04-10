@@ -67,6 +67,7 @@ public final class R {
         public static final int task_editor=0x7f0b0001;
         public static final int task_list=0x7f0b0005;
         public static final int tomorrow_list_contextmenu_delete=0x7f0b000d;
+        public static final int tomorrow_list_contextmenu_edit=0x7f0b000e;
     }
     public static final class integer {
         public static final int activity_animation_duration=0x7f060001;
