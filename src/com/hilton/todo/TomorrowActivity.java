@@ -9,23 +9,26 @@ import android.app.AlertDialog;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
-import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.CursorAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -94,6 +97,43 @@ public class TomorrowActivity extends Activity {
 		return mGestureDetector.onTouchEvent(event);
 	    }
 	});
+        registerForContextMenu(mTaskList);
+    }
+
+    @Override
+    public void onDestroy() {
+	super.onDestroy();
+	unregisterForContextMenu(mTaskList);
+    }
+    
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+	switch (item.getItemId()) {
+	case R.id.tomorrow_list_contextmenu_delete:
+	    AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+	    getContentResolver().delete(Task.CONTENT_URI, TaskColumns._ID + "=?", new String[]{String.valueOf(info.id)});
+	    return true;
+	}
+	return super.onContextItemSelected(item);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+	getMenuInflater().inflate(R.menu.tomorrow_contextmenu, menu);
+	final long id = ((AdapterContextMenuInfo) menuInfo).id;
+	final Uri uri = ContentUris.withAppendedId(Task.CONTENT_URI, id);
+	final Cursor c = getContentResolver().query(uri, new String[]{TaskColumns.TASK}, null, null, null);
+	if (c == null || !c.moveToFirst() || c.getCount() != 1) {
+	    Log.e(TAG, "shit, something is wrong, duplicated uri");
+	    if (c == null) {
+		return;
+	    }
+	    c.close();
+	    return;
+	}
+	Log.e(TAG, "onCreateContextMenu " + id);
+        menu.setHeaderTitle(c.getString(0));
+	super.onCreateContextMenu(menu, v, menuInfo);
     }
 
     @Override
@@ -135,30 +175,30 @@ public class TomorrowActivity extends Activity {
 	        }
 	    });
 
-            view.setOnLongClickListener(new OnLongClickListener() {
-        	@Override
-        	public boolean onLongClick(View v) {
-        	    final View textEntryView = mFactory.inflate(R.layout.dialog_edit_task, null);
-        	    mDialogEditTask = new AlertDialog.Builder(TomorrowActivity.this)
-        	    .setIcon(android.R.drawable.ic_dialog_alert)
-        	    .setTitle(R.string.dialog_edit_title)
-        	    .setView(textEntryView)
-        	    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-        		public void onClick(DialogInterface dialog, int whichButton) {
-        		    final EditText box = (EditText) mDialogEditTask.findViewById(R.id.edit_box);
-        		    final ContentValues cv = new ContentValues();
-        		    cv.put(TaskColumns.TASK, box.getText().toString());
-        		    getContentResolver().update(uri, cv, null, null);
-        		}
-        	    })
-        	    .setNegativeButton(android.R.string.cancel, null)
-        	    .create();
-        	    mDialogEditTask.show();
-        	    EditText box = (EditText) mDialogEditTask.findViewById(R.id.edit_box);
-        	    box.setText(taskContent);
-        	    return true;
-        	}
-            });
+//            view.setOnLongClickListener(new OnLongClickListener() {
+//        	@Override
+//        	public boolean onLongClick(View v) {
+//        	    final View textEntryView = mFactory.inflate(R.layout.dialog_edit_task, null);
+//        	    mDialogEditTask = new AlertDialog.Builder(TomorrowActivity.this)
+//        	    .setIcon(android.R.drawable.ic_dialog_alert)
+//        	    .setTitle(R.string.dialog_edit_title)
+//        	    .setView(textEntryView)
+//        	    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+//        		public void onClick(DialogInterface dialog, int whichButton) {
+//        		    final EditText box = (EditText) mDialogEditTask.findViewById(R.id.edit_box);
+//        		    final ContentValues cv = new ContentValues();
+//        		    cv.put(TaskColumns.TASK, box.getText().toString());
+//        		    getContentResolver().update(uri, cv, null, null);
+//        		}
+//        	    })
+//        	    .setNegativeButton(android.R.string.cancel, null)
+//        	    .create();
+//        	    mDialogEditTask.show();
+//        	    EditText box = (EditText) mDialogEditTask.findViewById(R.id.edit_box);
+//        	    box.setText(taskContent);
+//        	    return true;
+//        	}
+//            });
             view.setOnTouchListener(new OnTouchListener() {
 	        @Override
 	        public boolean onTouch(View v, MotionEvent event) {
