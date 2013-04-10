@@ -14,7 +14,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.KeyEvent;
@@ -26,15 +25,12 @@ import android.view.View.OnKeyListener;
 import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.Animation.AnimationListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CursorAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ViewSwitcher;
 
 import com.hilton.todo.Task.ProjectionIndex;
 import com.hilton.todo.Task.TaskColumns;
@@ -120,13 +116,7 @@ public class TomorrowActivity extends Activity {
             if (view  == null) {
                 view = mFactory.inflate(R.layout.tomorrow_task_item, null);
             }
-            Log.e(TAG, "bind view, lalala");
-            final ViewSwitcher switcher = (ViewSwitcher) view.findViewById(R.id.action_switcher);
-            if (switcher.getDisplayedChild() == 1) {
-        	switcher.clearAnimation();
-        	switcher.showPrevious();
-        	switcher.clearAnimation();
-            }
+
             final String taskContent = cursor.getString(ProjectionIndex.TASK);
             final short done = cursor.getShort(ProjectionIndex.DONE);
             final int id = cursor.getInt(ProjectionIndex.ID);
@@ -144,38 +134,7 @@ public class TomorrowActivity extends Activity {
 	    	    Toast.makeText(getApplication(), getString(R.string.move_to_today_tip).replace("#", taskContent), Toast.LENGTH_SHORT).show();
 	        }
 	    });
-            view.setOnClickListener(new OnClickListener() {
-		@Override
-		public void onClick(View v) {
-		    switcher.showNext();
-		    if (switcher.getDisplayedChild() == 0) {
-			switcher.getInAnimation().setAnimationListener(null);
-			return;
-		    }
-		    final ImageView delete = (ImageView) v.findViewById(R.id.action_delete_task);
-		    delete.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-			    switcher.getInAnimation().setAnimationListener(new AnimationListener() {
-				@Override
-				public void onAnimationEnd(Animation animation) {
-				    switcher.getInAnimation().setAnimationListener(null);
-				    getContentResolver().delete(uri, null, null);
-				}
 
-				@Override
-				public void onAnimationRepeat(Animation animation) {
-				}
-
-				@Override
-				public void onAnimationStart(Animation animation) {
-				}
-			    });
-			    switcher.showPrevious();
-			}
-		    });
-		}
-            });
             view.setOnLongClickListener(new OnLongClickListener() {
         	@Override
         	public boolean onLongClick(View v) {
