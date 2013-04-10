@@ -9,6 +9,7 @@ import android.app.AlertDialog;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -108,11 +109,36 @@ public class TomorrowActivity extends Activity {
     
     @Override
     public boolean onContextItemSelected(MenuItem item) {
+	AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+	final Uri uri = ContentUris.withAppendedId(Task.CONTENT_URI, info.id);
 	switch (item.getItemId()) {
 	case R.id.tomorrow_list_contextmenu_delete:
-	    AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-	    getContentResolver().delete(Task.CONTENT_URI, TaskColumns._ID + "=?", new String[]{String.valueOf(info.id)});
+	    getContentResolver().delete(uri, null, null);
 	    return true;
+	case R.id.tomorrow_list_contextmenu_edit: {
+	    final View textEntryView = mFactory.inflate(R.layout.dialog_edit_task, null);
+	    mDialogEditTask = new AlertDialog.Builder(TomorrowActivity.this)
+	    .setIcon(android.R.drawable.ic_dialog_alert)
+	    .setTitle(R.string.dialog_edit_title)
+	    .setView(textEntryView)
+	    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+		public void onClick(DialogInterface dialog, int whichButton) {
+		    final EditText box = (EditText) mDialogEditTask.findViewById(R.id.edit_box);
+		    final ContentValues cv = new ContentValues();
+		    cv.put(TaskColumns.TASK, box.getText().toString());
+		    getContentResolver().update(uri, cv, null, null);
+		}
+	    })
+	    .setNegativeButton(android.R.string.cancel, null)
+	    .create();
+	    mDialogEditTask.show();
+	    EditText box = (EditText) mDialogEditTask.findViewById(R.id.edit_box);
+	    box.setText(getTaskContent(uri));
+	    return true;
+	}
+	default:
+	    Log.e(TAG, "bad context menu id " + item.getItemId());
+	    break;
 	}
 	return super.onContextItemSelected(item);
     }
@@ -122,18 +148,22 @@ public class TomorrowActivity extends Activity {
 	getMenuInflater().inflate(R.menu.tomorrow_contextmenu, menu);
 	final long id = ((AdapterContextMenuInfo) menuInfo).id;
 	final Uri uri = ContentUris.withAppendedId(Task.CONTENT_URI, id);
+	final String task = getTaskContent(uri);
+        menu.setHeaderTitle(task);
+	super.onCreateContextMenu(menu, v, menuInfo);
+    }
+
+    private String getTaskContent(final Uri uri) {
 	final Cursor c = getContentResolver().query(uri, new String[]{TaskColumns.TASK}, null, null, null);
 	if (c == null || !c.moveToFirst() || c.getCount() != 1) {
 	    Log.e(TAG, "shit, something is wrong, duplicated uri");
 	    if (c == null) {
-		return;
+		return "";
 	    }
 	    c.close();
-	    return;
+	    return "";
 	}
-	Log.e(TAG, "onCreateContextMenu " + id);
-        menu.setHeaderTitle(c.getString(0));
-	super.onCreateContextMenu(menu, v, menuInfo);
+	return c.getString(0);
     }
 
     @Override
@@ -174,31 +204,6 @@ public class TomorrowActivity extends Activity {
 	    	    Toast.makeText(getApplication(), getString(R.string.move_to_today_tip).replace("#", taskContent), Toast.LENGTH_SHORT).show();
 	        }
 	    });
-
-//            view.setOnLongClickListener(new OnLongClickListener() {
-//        	@Override
-//        	public boolean onLongClick(View v) {
-//        	    final View textEntryView = mFactory.inflate(R.layout.dialog_edit_task, null);
-//        	    mDialogEditTask = new AlertDialog.Builder(TomorrowActivity.this)
-//        	    .setIcon(android.R.drawable.ic_dialog_alert)
-//        	    .setTitle(R.string.dialog_edit_title)
-//        	    .setView(textEntryView)
-//        	    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-//        		public void onClick(DialogInterface dialog, int whichButton) {
-//        		    final EditText box = (EditText) mDialogEditTask.findViewById(R.id.edit_box);
-//        		    final ContentValues cv = new ContentValues();
-//        		    cv.put(TaskColumns.TASK, box.getText().toString());
-//        		    getContentResolver().update(uri, cv, null, null);
-//        		}
-//        	    })
-//        	    .setNegativeButton(android.R.string.cancel, null)
-//        	    .create();
-//        	    mDialogEditTask.show();
-//        	    EditText box = (EditText) mDialogEditTask.findViewById(R.id.edit_box);
-//        	    box.setText(taskContent);
-//        	    return true;
-//        	}
-//            });
             view.setOnTouchListener(new OnTouchListener() {
 	        @Override
 	        public boolean onTouch(View v, MotionEvent event) {
