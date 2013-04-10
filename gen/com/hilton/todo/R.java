@@ -54,10 +54,10 @@ public final class R {
     }
     public static final class id {
         public static final int action_delete_task=0x7f0a0008;
-        public static final int action_move_to_today=0x7f0a000b;
+        public static final int action_move_to_today=0x7f0a000c;
         public static final int action_switcher=0x7f0a0006;
         public static final int action_toggle_done=0x7f0a0007;
-        public static final int dragging=0x7f0a000c;
+        public static final int dragging=0x7f0a000b;
         public static final int edit_box=0x7f0a0000;
         public static final int header=0x7f0a0004;
         public static final int history_move_to_today=0x7f0a0002;
