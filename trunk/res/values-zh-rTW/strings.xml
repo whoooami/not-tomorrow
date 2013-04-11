@@ -22,4 +22,6 @@
     <string name="goto_tomorrow">明天</string>
     <string name="view_history">查看歷史記錄</string>
     <string name="move_to_today_tip">\"#\"已經移到今日。</string>
+    <string name="delete">移除</string>
+    <string name="edit">編輯</string>
 </resources>
