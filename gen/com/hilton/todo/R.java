@@ -92,8 +92,10 @@ public final class R {
         public static final int cancel=0x7f08000b;
         public static final int clear_history=0x7f080007;
         public static final int date_format=0x7f080005;
+        public static final int delete=0x7f080013;
         public static final int delete_description=0x7f080004;
         public static final int dialog_edit_title=0x7f080012;
+        public static final int edit=0x7f080014;
         public static final int empty_history=0x7f080008;
         public static final int goto_tomorrow=0x7f08000e;
         public static final int move_to_today=0x7f08000d;
