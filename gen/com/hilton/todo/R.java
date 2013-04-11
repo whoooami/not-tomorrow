@@ -53,21 +53,18 @@ public final class R {
         public static final int line=0x7f020013;
     }
     public static final class id {
-        public static final int action_delete_task=0x7f0b0008;
-        public static final int action_move_to_today=0x7f0b000c;
-        public static final int action_switcher=0x7f0b0006;
-        public static final int action_toggle_done=0x7f0b0007;
-        public static final int dragging=0x7f0b000b;
+        public static final int action_move_to_today=0x7f0b0009;
+        public static final int action_toggle_done=0x7f0b0006;
+        public static final int dragging=0x7f0b0008;
         public static final int edit_box=0x7f0b0000;
         public static final int header=0x7f0b0004;
         public static final int history_move_to_today=0x7f0b0002;
         public static final int history_task_text=0x7f0b0003;
-        public static final int push_to_tomorrow=0x7f0b000a;
-        public static final int task=0x7f0b0009;
+        public static final int task=0x7f0b0007;
         public static final int task_editor=0x7f0b0001;
         public static final int task_list=0x7f0b0005;
-        public static final int tomorrow_list_contextmenu_delete=0x7f0b000d;
-        public static final int tomorrow_list_contextmenu_edit=0x7f0b000e;
+        public static final int tomorrow_list_contextmenu_delete=0x7f0b000a;
+        public static final int tomorrow_list_contextmenu_edit=0x7f0b000b;
     }
     public static final class integer {
         public static final int activity_animation_duration=0x7f060001;

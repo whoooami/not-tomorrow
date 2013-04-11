@@ -5,12 +5,10 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Typeface;
@@ -29,24 +27,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
-import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.Animation.AnimationListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.CursorAdapter;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.ViewSwitcher;
 
 import com.hilton.todo.Task.ProjectionIndex;
 import com.hilton.todo.Task.TaskColumns;
@@ -167,12 +158,6 @@ public class TodayActivity extends Activity {
              * That's why "Do it Tomorrow" app use a separate mode to delete rather than in your way, becuase it is almost
              * impossible to trust view.
              */
-            final ViewSwitcher switcher = (ViewSwitcher) view.findViewById(R.id.action_switcher);
-            if (switcher.getDisplayedChild() == 1) {
-        	switcher.clearAnimation();
-        	switcher.showPrevious();
-        	switcher.clearAnimation();
-            }
             final CheckBox toggle = (CheckBox) view.findViewById(R.id.action_toggle_done);
             final short done = cursor.getShort(ProjectionIndex.DONE);
             final int id = cursor.getInt(ProjectionIndex.ID);
@@ -196,66 +181,6 @@ public class TodayActivity extends Activity {
         	}
 
             });
-            view.setOnClickListener(new OnClickListener() {
-	        @Override
-	        public void onClick(View v) {
-	            switcher.showNext();
-	            if (switcher.getDisplayedChild() == 0) {
-	        	switcher.getInAnimation().setAnimationListener(null);
-	        	return;
-	            }
-	            final ImageView delete = (ImageView) v.findViewById(R.id.action_delete_task);
-	            delete.setOnClickListener(new OnClickListener() {
-		        @Override
-		        public void onClick(View v) {
-		            switcher.getInAnimation().setAnimationListener(new AnimationListener() {
-		        	@Override
-		        	public void onAnimationEnd(Animation animation) {
-		        	    switcher.getInAnimation().setAnimationListener(null);
-		        	    final Uri uri = ContentUris.withAppendedId(Task.CONTENT_URI, id);
-		        	    getContentResolver().delete(uri, null, null);
-		        	}
-		        	
-		        	@Override
-		        	public void onAnimationRepeat(Animation animation) {
-		        	}
-		        	
-		        	@Override
-		        	public void onAnimationStart(Animation animation) {
-		        	}
-		            });
-		            switcher.showPrevious();
-		        }
-		    });
-	        }
-	    });
-            view.setOnLongClickListener(new OnLongClickListener() {
-		@Override
-		public boolean onLongClick(View v) {
-		    if (done != 0) {
-			return true;
-		    }
-		    final View textEntryView = mFactory.inflate(R.layout.dialog_edit_task, null);
-		    mDialogEditTask = new AlertDialog.Builder(TodayActivity.this)
-		    .setIcon(android.R.drawable.ic_dialog_alert)
-		    .setTitle(R.string.dialog_edit_title)
-		    .setView(textEntryView)
-		    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-			    final EditText box = (EditText) mDialogEditTask.findViewById(R.id.edit_box);
-			    final ContentValues cv = new ContentValues();
-			    cv.put(TaskColumns.TASK, box.getText().toString());
-			    getContentResolver().update(uri, cv, null, null);
-			}
-		    })
-		    .setNegativeButton(android.R.string.cancel, null)
-		    .create();
-		    mDialogEditTask.show();
-		    EditText box = (EditText) mDialogEditTask.findViewById(R.id.edit_box);
-		    box.setText(taskContent);
-		    return true;
-		}
-            });
             view.setOnTouchListener(new OnTouchListener() {
 	        @Override
 	        public boolean onTouch(View v, MotionEvent event) {
@@ -274,21 +199,6 @@ public class TodayActivity extends Activity {
         	task.setText(taskContent);
         	task.setTextAppearance(getApplication(), R.style.task_item_text);
             }
-            final ImageView push = (ImageView) view.findViewById(R.id.push_to_tomorrow);
-            push.setOnClickListener(new OnClickListener() {
-	        @Override
-	        public void onClick(View v) {
-	    	    final Uri uri = ContentUris.withAppendedId(Task.CONTENT_URI, id);
-	    	    final ContentValues values = new ContentValues(2);
-	    	    values.put(TaskColumns.TYPE, Task.TYPE_TOMORROW);
-	    	    final Calendar today = new GregorianCalendar();
-	    	    today.add(Calendar.DAY_OF_YEAR, 1);
-	    	    values.put(TaskColumns.MODIFIED, today.getTimeInMillis());
-	    	    values.put(TaskColumns.DAY, today.get(Calendar.DAY_OF_YEAR));
-	    	    getContentResolver().update(uri, values, null, null);
-	    	    Toast.makeText(getApplication(), getString(R.string.move_to_tomorrow_tip).replace("#", taskContent), Toast.LENGTH_SHORT).show();
-	        }
-	    });
         }
 
         @Override
