@@ -5,10 +5,12 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Typeface;
@@ -19,6 +21,9 @@ import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
+import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.KeyEvent;
@@ -31,6 +36,7 @@ import android.view.View.OnKeyListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
@@ -38,6 +44,7 @@ import android.widget.CursorAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.hilton.todo.Task.ProjectionIndex;
 import com.hilton.todo.Task.TaskColumns;
@@ -96,6 +103,86 @@ public class TodayActivity extends Activity {
 		return mGestureDetector.onTouchEvent(event);
 	    }
 	});
+        registerForContextMenu(mTaskList);
+    }
+
+    @Override
+    public void onDestroy() {
+	super.onDestroy();
+	unregisterForContextMenu(mTaskList);
+    }
+    
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+	AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+	final Uri uri = ContentUris.withAppendedId(Task.CONTENT_URI, info.id);
+	switch (item.getItemId()) {
+	case R.id.today_list_contextmenu_delete:
+	    getContentResolver().delete(uri, null, null);
+	    return true;
+	case R.id.today_list_contextmenu_edit: {
+	    final View textEntryView = mFactory.inflate(R.layout.dialog_edit_task, null);
+	    mDialogEditTask = new AlertDialog.Builder(TodayActivity.this)
+	    .setIcon(android.R.drawable.ic_dialog_alert)
+	    .setTitle(R.string.dialog_edit_title)
+	    .setView(textEntryView)
+	    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+		public void onClick(DialogInterface dialog, int whichButton) {
+		    final EditText box = (EditText) mDialogEditTask.findViewById(R.id.edit_box);
+		    final ContentValues cv = new ContentValues();
+		    cv.put(TaskColumns.TASK, box.getText().toString());
+		    getContentResolver().update(uri, cv, null, null);
+		}
+	    })
+	    .setNegativeButton(android.R.string.cancel, null)
+	    .create();
+	    mDialogEditTask.show();
+	    EditText box = (EditText) mDialogEditTask.findViewById(R.id.edit_box);
+	    box.setText(getTaskContent(uri));
+	    return true;
+	}
+	case R.id.today_list_contextmenu_push: {
+    	    final ContentValues values = new ContentValues(2);
+    	    values.put(TaskColumns.TYPE, Task.TYPE_TOMORROW);
+    	    final Calendar today = new GregorianCalendar();
+    	    today.add(Calendar.DAY_OF_YEAR, 1);
+    	    values.put(TaskColumns.MODIFIED, today.getTimeInMillis());
+    	    values.put(TaskColumns.DAY, today.get(Calendar.DAY_OF_YEAR));
+    	    getContentResolver().update(uri, values, null, null);
+    	    Toast.makeText(getApplication(), getString(R.string.move_to_tomorrow_tip).replace("#", getTaskContent(uri)), 
+    		    Toast.LENGTH_SHORT).show();
+	}
+	default:
+	    Log.e(TAG, "bad context menu id " + item.getItemId());
+	    break;
+	}
+	return super.onContextItemSelected(item);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+	final long id = ((AdapterContextMenuInfo) menuInfo).id;
+	if (id <= 0) {
+	    return;
+	}
+	getMenuInflater().inflate(R.menu.today_contextmenu, menu);
+	final Uri uri = ContentUris.withAppendedId(Task.CONTENT_URI, id);
+	final String task = getTaskContent(uri);
+        menu.setHeaderTitle(task);
+	super.onCreateContextMenu(menu, v, menuInfo);
+    }
+
+    private String getTaskContent(final Uri uri) {
+	final Cursor c = getContentResolver().query(uri, new String[]{TaskColumns.TASK}, null, null, null);
+	if (c == null || !c.moveToFirst() || c.getCount() != 1) {
+	    Log.e(TAG, "shit, something is wrong, duplicated uri");
+	    if (c == null) {
+		return "";
+	    }
+	    c.close();
+	    return "";
+	}
+	return c.getString(0);
     }
     
     @Override

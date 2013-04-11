@@ -63,8 +63,12 @@ public final class R {
         public static final int task=0x7f0b0007;
         public static final int task_editor=0x7f0b0001;
         public static final int task_list=0x7f0b0005;
-        public static final int tomorrow_list_contextmenu_delete=0x7f0b000a;
-        public static final int tomorrow_list_contextmenu_edit=0x7f0b000b;
+        public static final int today_list_contextmenu_delete=0x7f0b000a;
+        public static final int today_list_contextmenu_edit=0x7f0b000b;
+        public static final int today_list_contextmenu_push=0x7f0b000c;
+        public static final int today_list_contextmenu_reorder=0x7f0b000d;
+        public static final int tomorrow_list_contextmenu_delete=0x7f0b000e;
+        public static final int tomorrow_list_contextmenu_edit=0x7f0b000f;
     }
     public static final class integer {
         public static final int activity_animation_duration=0x7f060001;
@@ -81,7 +85,8 @@ public final class R {
         public static final int tomorrow_task_item=0x7f030007;
     }
     public static final class menu {
-        public static final int tomorrow_contextmenu=0x7f0a0000;
+        public static final int today_contextmenu=0x7f0a0000;
+        public static final int tomorrow_contextmenu=0x7f0a0001;
     }
     public static final class string {
         public static final int add_hint=0x7f080001;
@@ -98,6 +103,8 @@ public final class R {
         public static final int move_to_today=0x7f08000d;
         public static final int move_to_today_tip=0x7f080010;
         public static final int move_to_tomorrow_tip=0x7f080011;
+        public static final int push=0x7f080015;
+        public static final int reorder=0x7f080016;
         public static final int select_time_period=0x7f08000c;
         public static final int set=0x7f08000a;
         public static final int set_time_period=0x7f080009;
