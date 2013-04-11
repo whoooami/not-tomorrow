@@ -27,4 +27,6 @@
     <string name="dialog_edit_title">Edit task</string>
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
+    <string name="push">Push to Tomorrow</string>
+    <string name="reorder">Reorder</string>
 </resources>

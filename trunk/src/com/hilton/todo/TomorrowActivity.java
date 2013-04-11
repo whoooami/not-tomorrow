@@ -145,8 +145,11 @@ public class TomorrowActivity extends Activity {
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-	getMenuInflater().inflate(R.menu.tomorrow_contextmenu, menu);
 	final long id = ((AdapterContextMenuInfo) menuInfo).id;
+	if (id <= 0) {
+	    return;
+	}
+	getMenuInflater().inflate(R.menu.tomorrow_contextmenu, menu);
 	final Uri uri = ContentUris.withAppendedId(Task.CONTENT_URI, id);
 	final String task = getTaskContent(uri);
         menu.setHeaderTitle(task);
