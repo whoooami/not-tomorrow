@@ -42,6 +42,7 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.CursorAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -53,16 +54,19 @@ public class TodayActivity extends Activity {
     protected static final String TAG = "TodayActivity";
     private static final int START_TOMORROW = 10;
     private static final int VIEW_HISTORY = 11;
+    private static final int REORDER = 0;
     private ListView mTaskList;
     private EditText mAddTaskEditor;
     private LayoutInflater mFactory;
     private GestureDetector mGestureDetector;
     private SwitchGestureListener mSwitchGestureListener;
-    protected Dialog mDialogEditTask;
+    private Dialog mDialogEditTask;
+    private boolean mReorderMode;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mReorderMode = false;
         setContentView(R.layout.today_activity);
         final TextView header = (TextView) findViewById(R.id.header);
         final Calendar date = new GregorianCalendar();
@@ -151,6 +155,7 @@ public class TodayActivity extends Activity {
     	    getContentResolver().update(uri, values, null, null);
     	    Toast.makeText(getApplication(), getString(R.string.move_to_tomorrow_tip).replace("#", getTaskContent(uri)), 
     		    Toast.LENGTH_SHORT).show();
+    	    return true;
 	}
 	default:
 	    Log.e(TAG, "bad context menu id " + item.getItemId());
@@ -161,6 +166,9 @@ public class TodayActivity extends Activity {
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+	if (mReorderMode) {
+	    return;
+	}
 	final long id = ((AdapterContextMenuInfo) menuInfo).id;
 	if (id <= 0) {
 	    return;
@@ -189,12 +197,36 @@ public class TodayActivity extends Activity {
     public void onResume() {
 	super.onResume();
 	mSwitchGestureListener.reset();
+	if (mReorderMode) {
+	    mReorderMode = false;
+	    mTaskList.invalidateViews();
+	}
     }
     
+    @Override
+    public void onPause() {
+	super.onPause();
+    }
+    
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+	switch (keyCode) {
+	case KeyEvent.KEYCODE_BACK:
+	case KeyEvent.KEYCODE_MENU:
+	    if (mReorderMode) {
+		mReorderMode = false;
+		mTaskList.invalidateViews();
+		return true;
+	    }
+	}
+	return super.onKeyDown(keyCode, event);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 	menu.add(0, START_TOMORROW, 0, R.string.goto_tomorrow);
 	menu.add(0, VIEW_HISTORY, 0, R.string.view_history);
+	menu.add(0, REORDER, 0, R.string.reorder);
 	return true;
     }
     
@@ -209,6 +241,12 @@ public class TodayActivity extends Activity {
 	    i.setClass(getApplication(), TaskHistoryActivity.class);
 	    startActivity(i);
 	    overridePendingTransition(R.anim.activity_enter_in, R.anim.activity_enter_out);
+	    break;
+	case REORDER:
+	    mReorderMode = true;
+	    mTaskList.invalidateViews();
+	    Log.e(TAG, "reorder things, are you aware of that");
+	    break;
 	default:
 	    break;
 	}
@@ -259,7 +297,7 @@ public class TodayActivity extends Activity {
              */
             toggle.setOnCheckedChangeListener(null);
             toggle.setChecked(done != 0);
-            toggle.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+            toggle.setOnCheckedChangeListener(mReorderMode ? null : new OnCheckedChangeListener() {
         	@Override
         	public void onCheckedChanged(CompoundButton view, boolean checked) {
         	    final ContentValues values = new ContentValues(1);
@@ -268,7 +306,8 @@ public class TodayActivity extends Activity {
         	}
 
             });
-            view.setOnTouchListener(new OnTouchListener() {
+            toggle.setVisibility(mReorderMode ? View.GONE : View.VISIBLE);
+            view.setOnTouchListener(mReorderMode ? null : new OnTouchListener() {
 	        @Override
 	        public boolean onTouch(View v, MotionEvent event) {
 	            return mGestureDetector.onTouchEvent(event);
@@ -286,6 +325,9 @@ public class TodayActivity extends Activity {
         	task.setText(taskContent);
         	task.setTextAppearance(getApplication(), R.style.task_item_text);
             }
+            
+            ImageView dragger = (ImageView) view.findViewById(R.id.dragging);
+            dragger.setVisibility(mReorderMode ? View.VISIBLE : View.GONE);
         }
 
         @Override
