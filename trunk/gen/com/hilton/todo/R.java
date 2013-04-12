@@ -66,9 +66,8 @@ public final class R {
         public static final int today_list_contextmenu_delete=0x7f0b000a;
         public static final int today_list_contextmenu_edit=0x7f0b000b;
         public static final int today_list_contextmenu_push=0x7f0b000c;
-        public static final int today_list_contextmenu_reorder=0x7f0b000d;
-        public static final int tomorrow_list_contextmenu_delete=0x7f0b000e;
-        public static final int tomorrow_list_contextmenu_edit=0x7f0b000f;
+        public static final int tomorrow_list_contextmenu_delete=0x7f0b000d;
+        public static final int tomorrow_list_contextmenu_edit=0x7f0b000e;
     }
     public static final class integer {
         public static final int activity_animation_duration=0x7f060001;
