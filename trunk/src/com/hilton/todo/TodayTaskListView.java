@@ -37,6 +37,8 @@ public class TodayTaskListView extends TaskListView {
     private DropListener mDropListener;
     private RemoveListener mRemoveListener;
     
+    private boolean mDraggingMode;
+    
     public TodayTaskListView(Context context, AttributeSet attrs) {
 	this(context, attrs, 0);
     }
@@ -45,9 +47,32 @@ public class TodayTaskListView extends TaskListView {
 	    AttributeSet paramAttributeSet, int paramInt) {
 	super(paramContext, paramAttributeSet, paramInt);
         mTouchSlop = ViewConfiguration.get(paramContext).getScaledTouchSlop();
+        mDraggingMode = false;
     }
+    
+    public void enterDragingMode() {
+	if (!mDraggingMode) {
+	    mDraggingMode = true;
+	    invalidateViews();
+	}
+    }
+    
+    public void exitDraggingMode() {
+	if (mDraggingMode) {
+	    mDraggingMode = false;
+	    invalidateViews();
+	}
+    }
+    
+    public boolean inDraggingMode() {
+	return mDraggingMode;
+    }
+    
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
+	if (!mDraggingMode) {
+	    return super.onInterceptTouchEvent(ev);
+	}
 	if (ev.getAction() != MotionEvent.ACTION_DOWN) {
 	    return super.onInterceptTouchEvent(ev);
 	}
@@ -62,7 +87,7 @@ public class TodayTaskListView extends TaskListView {
 	mDragPoint = y - itemView.getTop();
 	mDragOffset = (int) (ev.getRawY() - y);
 
-	final View dragger = itemView.findViewById(R.id.dragging);
+	final View dragger = itemView.findViewById(R.id.dragger);
 	if (dragger != null && x > dragger.getLeft() - 20) {
 	    mScrollUpBound = Math.min(y-mTouchSlop, getHeight()/3);
 	    mScrollDownBound = Math.max(y+mTouchSlop, getHeight()*2/3);
@@ -105,6 +130,9 @@ public class TodayTaskListView extends TaskListView {
     
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
+	if (!mDraggingMode) {
+	    return super.onTouchEvent(ev);
+	}
 	if (mDragView == null || mDragPosition == AdapterView.INVALID_POSITION) {
 	    return super.onTouchEvent(ev);
 	}

@@ -18,9 +18,9 @@
 	<TextView android:id="@+id/task"
            style="@style/task_item_text" />
 	
-	<ImageView android:id="@+id/dragging"
-        android:layout_width="48dip"
-        android:layout_height="48dip"
+	<ImageView android:id="@+id/dragger"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:contentDescription="dragging"
         android:scaleType="center"
         android:layout_gravity="center"
