@@ -43,12 +43,12 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.CursorAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.hilton.todo.Task.ProjectionIndex;
 import com.hilton.todo.Task.TaskColumns;
+import com.hilton.todo.TodayTaskListView.DropListener;
 
 public class TodayActivity extends Activity {
     protected static final String TAG = "TodayActivity";
@@ -107,12 +107,55 @@ public class TodayActivity extends Activity {
 	    }
 	});
         registerForContextMenu(mTaskList);
+        mTaskList.setDropListener(new DropListener() {
+	    @Override
+	    public void drop(int from, int to) {
+		    /*
+		     * Why data won't change before?
+		     * You see cursors return by #getItemAtPosition are the same cursor with positioning on different rows.
+		     * So, the cursors should be one the same row positioned by last call to #getItemAtPosition.
+		     *    Cursor c1 = #getItemAtPosition(0); // cursor.moveToPosition(0);
+		     *    // get data from c1
+		     *    Cursor c2 = #getItemAtPosition(2); // cursor.moveToPosition(2);
+		     *    // get data from c2
+		     *    Cursor c3 = #getItemAtPosition(4); // cursor.moveToPosition(4);
+		     *    // get data from c4
+		     *    
+		     *    now c1, c2 and c3 are all positioned at 4.
+		     *    So if you want to retrieve data on different row, you should get data after each #getItemAtPosition.
+		     */
+		    // swap modified time of mDragPosition and mDragSrcPosition
+		    final Cursor src = (Cursor) mTaskList.getItemAtPosition(from);
+		    Log.e(TAG, "----------------src cursor and current row of source cursor");
+		    android.database.DatabaseUtils.dumpCurrentRow(src);
+		    long srcModified = src.getLong(ProjectionIndex.MODIFIED);
+		    final Uri srcUri = ContentUris.withAppendedId(Task.CONTENT_URI, src.getLong(ProjectionIndex.ID));
+		    Log.e(TAG, "src uri " + srcUri);
+
+		    Log.e(TAG, "----------------dst cursor and current row of dst currsor");
+		    final Cursor dst = (Cursor) mTaskList.getItemAtPosition(to);
+		    android.database.DatabaseUtils.dumpCurrentRow(dst);
+		    long dstModified = dst.getLong(ProjectionIndex.MODIFIED);
+		    final Uri dstUri = ContentUris.withAppendedId(Task.CONTENT_URI, dst.getLong(ProjectionIndex.ID));
+		    Log.e(TAG, "\t\t, dst uri " + dstUri);
+		    Log.e(TAG, "srcm " + srcModified + ", dstM " + dstModified);
+		    
+		    final ContentValues values = new ContentValues(1);
+		    values.put(TaskColumns.MODIFIED, dstModified);
+		    getContentResolver().update(srcUri, values, null, null);
+		    values.clear();
+		    values.put(TaskColumns.MODIFIED, srcModified);
+		    getContentResolver().update(dstUri, values, null, null);
+		    Log.e(TAG, "data swapped, are you aware of that");
+	    }
+        });
     }
 
     @Override
     public void onDestroy() {
 	super.onDestroy();
 	unregisterForContextMenu(mTaskList);
+	mTaskList.setDropListener(null);
     }
     
     @Override
