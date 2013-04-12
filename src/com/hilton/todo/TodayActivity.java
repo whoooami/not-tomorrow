@@ -55,25 +55,24 @@ public class TodayActivity extends Activity {
     private static final int START_TOMORROW = 10;
     private static final int VIEW_HISTORY = 11;
     private static final int REORDER = 0;
-    private ListView mTaskList;
+    private TodayTaskListView mTaskList;
     private EditText mAddTaskEditor;
     private LayoutInflater mFactory;
     private GestureDetector mGestureDetector;
     private SwitchGestureListener mSwitchGestureListener;
     private Dialog mDialogEditTask;
-    private boolean mReorderMode;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mReorderMode = false;
         setContentView(R.layout.today_activity);
         final TextView header = (TextView) findViewById(R.id.header);
         final Calendar date = new GregorianCalendar();
         header.setText(getString(R.string.today).replace("#", new SimpleDateFormat(getString(R.string.date_format)).format(date.getTime())));
         
         mFactory = LayoutInflater.from(getApplication());
-        mTaskList = (ListView) findViewById(R.id.task_list);
+        mTaskList = (TodayTaskListView) findViewById(R.id.task_list);
+        mTaskList.exitDraggingMode();
         final View headerView = mFactory.inflate(R.layout.header_view, null);
         mTaskList.addHeaderView(headerView);
         mAddTaskEditor = (EditText) headerView.findViewById(R.id.task_editor);
@@ -166,7 +165,7 @@ public class TodayActivity extends Activity {
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-	if (mReorderMode) {
+	if (mTaskList.inDraggingMode()) {
 	    return;
 	}
 	final long id = ((AdapterContextMenuInfo) menuInfo).id;
@@ -197,9 +196,8 @@ public class TodayActivity extends Activity {
     public void onResume() {
 	super.onResume();
 	mSwitchGestureListener.reset();
-	if (mReorderMode) {
-	    mReorderMode = false;
-	    mTaskList.invalidateViews();
+	if (mTaskList.inDraggingMode()) {
+	    mTaskList.exitDraggingMode();
 	}
     }
     
@@ -213,9 +211,8 @@ public class TodayActivity extends Activity {
 	switch (keyCode) {
 	case KeyEvent.KEYCODE_BACK:
 	case KeyEvent.KEYCODE_MENU:
-	    if (mReorderMode) {
-		mReorderMode = false;
-		mTaskList.invalidateViews();
+	    if (mTaskList.inDraggingMode()) {
+		mTaskList.exitDraggingMode();
 		return true;
 	    }
 	}
@@ -243,8 +240,7 @@ public class TodayActivity extends Activity {
 	    overridePendingTransition(R.anim.activity_enter_in, R.anim.activity_enter_out);
 	    break;
 	case REORDER:
-	    mReorderMode = true;
-	    mTaskList.invalidateViews();
+	    mTaskList.enterDragingMode();
 	    Log.e(TAG, "reorder things, are you aware of that");
 	    break;
 	default:
@@ -297,7 +293,7 @@ public class TodayActivity extends Activity {
              */
             toggle.setOnCheckedChangeListener(null);
             toggle.setChecked(done != 0);
-            toggle.setOnCheckedChangeListener(mReorderMode ? null : new OnCheckedChangeListener() {
+            toggle.setOnCheckedChangeListener(mTaskList.inDraggingMode() ? null : new OnCheckedChangeListener() {
         	@Override
         	public void onCheckedChanged(CompoundButton view, boolean checked) {
         	    final ContentValues values = new ContentValues(1);
@@ -306,8 +302,8 @@ public class TodayActivity extends Activity {
         	}
 
             });
-            toggle.setVisibility(mReorderMode ? View.GONE : View.VISIBLE);
-            view.setOnTouchListener(mReorderMode ? null : new OnTouchListener() {
+            toggle.setVisibility(mTaskList.inDraggingMode() ? View.GONE : View.VISIBLE);
+            view.setOnTouchListener(mTaskList.inDraggingMode() ? null : new OnTouchListener() {
 	        @Override
 	        public boolean onTouch(View v, MotionEvent event) {
 	            return mGestureDetector.onTouchEvent(event);
@@ -326,8 +322,8 @@ public class TodayActivity extends Activity {
         	task.setTextAppearance(getApplication(), R.style.task_item_text);
             }
             
-            ImageView dragger = (ImageView) view.findViewById(R.id.dragging);
-            dragger.setVisibility(mReorderMode ? View.VISIBLE : View.GONE);
+            ImageView dragger = (ImageView) view.findViewById(R.id.dragger);
+            dragger.setVisibility(mTaskList.inDraggingMode() ? View.VISIBLE : View.GONE);
         }
 
         @Override
