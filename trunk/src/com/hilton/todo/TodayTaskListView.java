@@ -187,25 +187,40 @@ public class TodayTaskListView extends TaskListView {
 	}
 	
 	if (mDragPosition > 0 && mDragPosition < getAdapter().getCount()) {
+	    /*
+	     * Why data won't change before?
+	     * You see cursors return by #getItemAtPosition are the same cursor with positioning on different rows.
+	     * So, the cursors should be one the same row positioned by last call to #getItemAtPosition.
+	     *    Cursor c1 = #getItemAtPosition(0); // cursor.moveToPosition(0);
+	     *    // get data from c1
+	     *    Cursor c2 = #getItemAtPosition(2); // cursor.moveToPosition(2);
+	     *    // get data from c2
+	     *    Cursor c3 = #getItemAtPosition(4); // cursor.moveToPosition(4);
+	     *    // get data from c4
+	     *    
+	     *    now c1, c2 and c3 are all positioned at 4.
+	     *    So if you want to retrieve data on different row, you should get data after each #getItemAtPosition.
+	     */
 	    // swap modified time of mDragPosition and mDragSrcPosition
 	    Log.e(TAG, "src " + mDragSrcPosition + ", dst " + mDragPosition + ", first visible " + getFirstVisiblePosition());
 	    Log.e(TAG, "child count " + getChildCount());
 	    Log.e(TAG, "adapter count " + getAdapter().getCount());
 	    final Cursor src = (Cursor) getItemAtPosition(mDragSrcPosition - getFirstVisiblePosition());
-	    android.database.DatabaseUtils.dumpCursor(src);
-	    Log.e(TAG, " src move to " + (mDragSrcPosition - 1) + ", " + src.moveToPosition(mDragSrcPosition - 1));
-	    final Cursor dst = (Cursor) getItemAtPosition(mDragPosition - getFirstVisiblePosition());
-	    Log.e(TAG, " dst move to " + (mDragPosition - 1) + ", " + dst.moveToPosition(mDragPosition - 1));
-	    android.database.DatabaseUtils.dumpCursor(dst);
-	    Log.e(TAG, "src " + src + ", dst " + dst);
+	    Log.e(TAG, "----------------src cursor and current row of source cursor");
 	    android.database.DatabaseUtils.dumpCurrentRow(src);
-	    android.database.DatabaseUtils.dumpCurrentRow(dst);
 	    long srcModified = src.getLong(ProjectionIndex.MODIFIED);
-	    long dstModified = dst.getLong(ProjectionIndex.MODIFIED);
-	    Log.e(TAG, "srcm " + srcModified + ", dstM " + dstModified);
-	    final ContentValues values = new ContentValues(1);
 	    final Uri srcUri = ContentUris.withAppendedId(Task.CONTENT_URI, src.getLong(ProjectionIndex.ID));
+	    Log.e(TAG, "src uri " + srcUri);
+
+	    Log.e(TAG, "----------------dst cursor and current row of dst currsor");
+	    final Cursor dst = (Cursor) getItemAtPosition(mDragPosition - getFirstVisiblePosition());
+	    android.database.DatabaseUtils.dumpCurrentRow(dst);
+	    long dstModified = dst.getLong(ProjectionIndex.MODIFIED);
 	    final Uri dstUri = ContentUris.withAppendedId(Task.CONTENT_URI, dst.getLong(ProjectionIndex.ID));
+	    Log.e(TAG, "\t\t, dst uri " + dstUri);
+	    Log.e(TAG, "srcm " + srcModified + ", dstM " + dstModified);
+	    
+	    final ContentValues values = new ContentValues(1);
 	    values.put(TaskColumns.MODIFIED, dstModified);
 	    getContext().getContentResolver().update(srcUri, values, null, null);
 	    values.clear();
