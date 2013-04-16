@@ -24,4 +24,6 @@
     <string name="move_to_today_tip">\"#\"已經移到今日。</string>
     <string name="delete">移除</string>
     <string name="edit">編輯</string>
+    <string name="push">推遲到明天</string>
+    <string name="reorder">重新調整順序</string>
 </resources>
