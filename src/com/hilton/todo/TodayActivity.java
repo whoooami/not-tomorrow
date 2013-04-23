@@ -48,6 +48,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.hilton.todo.Task.ProjectionIndex;
 import com.hilton.todo.Task.TaskColumns;
 import com.hilton.todo.TodayTaskListView.DropListener;
@@ -58,6 +59,7 @@ public class TodayActivity extends Activity {
     private static final int VIEW_HISTORY = 11;
     private static final int REORDER = 12;
     private static final int SYNC_GOOGLE_TASK = 13;
+    private static final int REQUEST_CODE_GOOGLE_PLAY_SERVICES = 100;
     private TodayTaskListView mTaskList;
     private EditText mAddTaskEditor;
     private LayoutInflater mFactory;
@@ -307,6 +309,10 @@ public class TodayActivity extends Activity {
 		    mNoNetworkNotify = Utility.createNoNetworkDialog(TodayActivity.this);
 		}
 		mNoNetworkNotify.show();
+	    } else {
+		if (checkGooglePlayServicesAvailability()) {
+		    // do authorization
+		}
 	    }
 	    break;
 	}
@@ -316,6 +322,31 @@ public class TodayActivity extends Activity {
 	return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	super.onActivityResult(requestCode, resultCode, data);
+	switch (requestCode) {
+	case REQUEST_CODE_GOOGLE_PLAY_SERVICES:
+	    if (resultCode == Activity.RESULT_OK) {
+//		do authorization
+	    } else {
+		checkGooglePlayServicesAvailability();
+	    }
+	    break;
+	}
+    }
+
+    private boolean checkGooglePlayServicesAvailability() {
+	final int connectionStatusCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+	if (GooglePlayServicesUtil.isUserRecoverableError(connectionStatusCode)) {
+	    final Dialog dialog = GooglePlayServicesUtil.getErrorDialog(connectionStatusCode,
+		    		TodayActivity.this, REQUEST_CODE_GOOGLE_PLAY_SERVICES);
+	    dialog.show();
+	    return false;
+	}
+	return true;
+    }
+    
     private void gotoTomorrow() {
 	final Intent i = new Intent();
 	i.setClass(getApplication(), TomorrowActivity.class);
