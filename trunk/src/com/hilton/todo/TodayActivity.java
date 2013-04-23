@@ -271,6 +271,12 @@ public class TodayActivity extends Activity {
     }
     
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+	menu.findItem(REORDER).setVisible(mTaskList.getChildCount()> 1);
+	return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 	switch (item.getItemId()) {
 	case START_TOMORROW:
