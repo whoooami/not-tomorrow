@@ -3,10 +3,17 @@ package com.hilton.todo;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 
 import com.hilton.todo.Task.TaskColumns;
 
@@ -32,5 +39,21 @@ public class Utility {
 	context.getContentResolver().update(Task.CONTENT_URI, values, TaskColumns.DAY + " = " + day, null);
 	
 	deleteObseleteTasks(context);
+    }
+    
+    public static Dialog createNoNetworkDialog(final Activity a) {
+	AlertDialog dialog = new AlertDialog.Builder(a)
+	.setIcon(android.R.drawable.ic_dialog_alert)
+	.setTitle("Network unavailable")
+	.setMessage("Network is currently not available. Please enable your network connectivity.")
+	.setPositiveButton("Enable", new OnClickListener() {
+	    @Override
+	    public void onClick(DialogInterface dialog, int which) {
+		a.startActivity(new Intent(Settings.ACTION_SETTINGS));
+	    }
+	})
+	.setNegativeButton("Cancel", null)
+	.create();
+	return dialog;
     }
 }

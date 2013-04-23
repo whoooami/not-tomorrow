@@ -14,6 +14,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Typeface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Spannable;
@@ -54,13 +56,16 @@ public class TodayActivity extends Activity {
     protected static final String TAG = "TodayActivity";
     private static final int START_TOMORROW = 10;
     private static final int VIEW_HISTORY = 11;
-    private static final int REORDER = 0;
+    private static final int REORDER = 12;
+    private static final int SYNC_GOOGLE_TASK = 13;
     private TodayTaskListView mTaskList;
     private EditText mAddTaskEditor;
     private LayoutInflater mFactory;
     private GestureDetector mGestureDetector;
     private SwitchGestureListener mSwitchGestureListener;
     private Dialog mDialogEditTask;
+    private ConnectivityManager mConnectivityManager;
+    private Dialog mNoNetworkNotify;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -149,6 +154,7 @@ public class TodayActivity extends Activity {
 		    Log.e(TAG, "data swapped, are you aware of that");
 	    }
         });
+        mConnectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 
     @Override
@@ -267,6 +273,7 @@ public class TodayActivity extends Activity {
 	menu.add(0, START_TOMORROW, 0, R.string.goto_tomorrow);
 	menu.add(0, VIEW_HISTORY, 0, R.string.view_history);
 	menu.add(0, REORDER, 0, R.string.reorder);
+	menu.add(0, SYNC_GOOGLE_TASK, 0, "Sync");
 	return true;
     }
     
@@ -292,6 +299,17 @@ public class TodayActivity extends Activity {
 	    mTaskList.enterDragingMode();
 	    Log.e(TAG, "reorder things, are you aware of that");
 	    break;
+	case SYNC_GOOGLE_TASK: {
+	    // first check the network
+	    NetworkInfo info = mConnectivityManager.getActiveNetworkInfo();
+	    if (info == null || !info.isConnected()) {
+		if (mNoNetworkNotify == null) {
+		    mNoNetworkNotify = Utility.createNoNetworkDialog(TodayActivity.this);
+		}
+		mNoNetworkNotify.show();
+	    }
+	    break;
+	}
 	default:
 	    break;
 	}
