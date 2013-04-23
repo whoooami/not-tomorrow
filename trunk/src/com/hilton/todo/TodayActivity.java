@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -12,6 +13,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
@@ -49,6 +51,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.services.tasks.TasksScopes;
 import com.hilton.todo.Task.ProjectionIndex;
 import com.hilton.todo.Task.TaskColumns;
 import com.hilton.todo.TodayTaskListView.DropListener;
@@ -60,6 +68,9 @@ public class TodayActivity extends Activity {
     private static final int REORDER = 12;
     private static final int SYNC_GOOGLE_TASK = 13;
     private static final int REQUEST_CODE_GOOGLE_PLAY_SERVICES = 100;
+    private static final int REQUEST_CODE_ACCOUNT_PICKER = 101;
+    private static final String PREF_ACCOUNT_NAME = "accountName";
+    
     private TodayTaskListView mTaskList;
     private EditText mAddTaskEditor;
     private LayoutInflater mFactory;
@@ -68,6 +79,10 @@ public class TodayActivity extends Activity {
     private Dialog mDialogEditTask;
     private ConnectivityManager mConnectivityManager;
     private Dialog mNoNetworkNotify;
+    final HttpTransport transport = AndroidHttp.newCompatibleTransport();
+    final JsonFactory jsonFactory = new GsonFactory();
+    private GoogleAccountCredential mCredential;
+    private com.google.api.services.tasks.Tasks mTaskService;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -157,6 +172,8 @@ public class TodayActivity extends Activity {
 	    }
         });
         mConnectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        
+
     }
 
     @Override
@@ -312,6 +329,8 @@ public class TodayActivity extends Activity {
 	    } else {
 		if (checkGooglePlayServicesAvailability()) {
 		    // do authorization
+		    prepareAuthentication();
+		    trySynchronize();
 		}
 	    }
 	    break;
@@ -322,6 +341,27 @@ public class TodayActivity extends Activity {
 	return super.onOptionsItemSelected(item);
     }
 
+    private void trySynchronize() {
+	if (mCredential.getSelectedAccountName() == null) {
+	    // need to authorize
+	    startActivityForResult(mCredential.newChooseAccountIntent(), REQUEST_CODE_ACCOUNT_PICKER);
+	} else {
+	    doSynchronization();
+	}
+    }
+
+    private void prepareAuthentication() {
+	if (mCredential == null) {
+	    mCredential = GoogleAccountCredential.usingOAuth2(this, TasksScopes.TASKS);
+	}
+	if (mTaskService == null) {
+	    mTaskService = new com.google.api.services.tasks.Tasks.Builder(transport, jsonFactory, mCredential)
+	    		.setApplicationName("Google-TasksAndroidSample/1.0").build();
+	}
+	SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
+	mCredential.setSelectedAccountName(settings.getString(PREF_ACCOUNT_NAME, null));
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 	super.onActivityResult(requestCode, resultCode, data);
@@ -329,11 +369,30 @@ public class TodayActivity extends Activity {
 	case REQUEST_CODE_GOOGLE_PLAY_SERVICES:
 	    if (resultCode == Activity.RESULT_OK) {
 //		do authorization
+		prepareAuthentication();
+		trySynchronize();
 	    } else {
 		checkGooglePlayServicesAvailability();
 	    }
 	    break;
+	case REQUEST_CODE_ACCOUNT_PICKER:
+	    if (resultCode == Activity.RESULT_OK && data != null && data.getExtras() != null) {
+		String accountName = data.getExtras().getString(AccountManager.KEY_ACCOUNT_NAME);
+		if (accountName != null) {
+		    mCredential.setSelectedAccountName(accountName);
+		    SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
+		    SharedPreferences.Editor editor = settings.edit();
+		    editor.putString(PREF_ACCOUNT_NAME, accountName);
+		    editor.commit();
+		    doSynchronization();
+		}
+	    }
+	    break;
 	}
+    }
+
+    private void doSynchronization() {
+	Log.e(TAG, "lalallala, let do synchronization");
     }
 
     private boolean checkGooglePlayServicesAvailability() {
