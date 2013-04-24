@@ -1,12 +1,16 @@
 package com.hilton.todo;
 
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.os.AsyncTask;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -14,7 +18,9 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GooglePlayServicesAvailabilityIOException;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.api.services.tasks.Tasks;
+import com.google.api.services.tasks.Tasks.TasksOperations;
 import com.google.api.services.tasks.model.Task;
+import com.hilton.todo.Task.TaskColumns;
 
 public class AsyncTasksLoader extends AsyncTask<Void, Void, Boolean> {
     private static final String TAG = "AsyncTasksLoader";
@@ -30,10 +36,29 @@ public class AsyncTasksLoader extends AsyncTask<Void, Void, Boolean> {
     @Override
     protected Boolean doInBackground(Void... params) {
 	try {
-	    final List<Task> tasks = mTaskService.tasks().list("@default").setFields("items/title").execute().getItems();
+	    TasksOperations.List operatorList = mTaskService.tasks().list("@default");
+	    final List<Task> tasks = operatorList.execute().getItems();
+	    final ContentValues cv = new ContentValues();
 	    if (tasks != null) {
 		for (Task t : tasks) {
-		    Log.e(TAG, "\t\tgot task: '" + t.getTitle());
+		    Log.e(TAG, "\t\tgot task: '" + t.getTitle() + ", updated " + 
+			    t.getUpdated().getValue() + ", complted " + t.getCompleted() + ", deleted " + t.getDeleted());
+		    if (t.getDeleted() != null && t.getDeleted()) {
+			continue;
+		    }
+		    if (TextUtils.isEmpty(t.getTitle())) {
+			continue;
+		    }
+		    final long updated = t.getUpdated().getValue();
+		    final Calendar date = new GregorianCalendar();
+		    date.setTimeInMillis(updated);
+		    cv.clear();
+		    cv.put(TaskColumns.TASK, t.getTitle());
+		    cv.put(TaskColumns.DONE, (t.getCompleted() == null ? 0 : 1));
+		    cv.put(TaskColumns.MODIFIED, t.getUpdated().getValue());
+		    cv.put(TaskColumns.DAY, date.get(Calendar.DAY_OF_YEAR));
+		    cv.put(TaskColumns.TYPE, com.hilton.todo.Task.TYPE_TODAY);
+		    mActivity.getContentResolver().insert(com.hilton.todo.Task.CONTENT_URI, cv);
 		}
 	    }
 	    return true;
