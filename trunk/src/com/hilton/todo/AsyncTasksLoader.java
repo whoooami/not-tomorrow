@@ -1,7 +1,9 @@
 package com.hilton.todo;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -9,6 +11,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Log;
@@ -17,9 +20,11 @@ import android.widget.Toast;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GooglePlayServicesAvailabilityIOException;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
+import com.google.api.client.util.DateTime;
 import com.google.api.services.tasks.Tasks;
 import com.google.api.services.tasks.Tasks.TasksOperations;
 import com.google.api.services.tasks.model.Task;
+import com.hilton.todo.Task.ProjectionIndex;
 import com.hilton.todo.Task.TaskColumns;
 
 public class AsyncTasksLoader extends AsyncTask<Void, Void, Boolean> {
@@ -36,6 +41,11 @@ public class AsyncTasksLoader extends AsyncTask<Void, Void, Boolean> {
     @Override
     protected Boolean doInBackground(Void... params) {
 	try {
+	    // step 1: read data of local
+	    final List<Task> localTasks = getLocalTasks();
+	    for (Task t : localTasks) {
+		Log.e(TAG, "look at local tasks: " + t.getTitle());
+	    }
 	    TasksOperations.List operatorList = mTaskService.tasks().list("@default");
 	    final List<Task> tasks = operatorList.execute().getItems();
 	    final ContentValues cv = new ContentValues();
@@ -72,6 +82,31 @@ public class AsyncTasksLoader extends AsyncTask<Void, Void, Boolean> {
 	    Log.e(TAG, "exception caught, ", e);
 	}
 	return false;
+    }
+
+    private List<Task> getLocalTasks() {
+	final Cursor c = mActivity.getContentResolver().query(com.hilton.todo.Task.CONTENT_URI, 
+	    com.hilton.todo.Task.PROJECTION, TaskColumns.TYPE + "=?", 
+	    new String[]{String.valueOf(com.hilton.todo.Task.TYPE_TODAY)}, null);
+	List<Task> tasks = new ArrayList<Task>();
+	if (c == null) {
+	    return tasks;
+	}
+	if (!c.moveToFirst()) {
+	    c.close();
+	    return tasks;
+	}
+	do {
+	    Task t = new Task();
+	    t.setTitle(c.getString(ProjectionIndex.TASK));
+	    boolean done = c.getInt(ProjectionIndex.DONE) == 1;
+	    DateTime d = new DateTime(c.getLong(ProjectionIndex.MODIFIED));
+	    t.setCompleted(done ? d : null);
+	    t.setUpdated(d);
+	    tasks.add(t);
+	} while (c.moveToNext());
+	c.close();
+	return tasks;
     }
 
     @Override
