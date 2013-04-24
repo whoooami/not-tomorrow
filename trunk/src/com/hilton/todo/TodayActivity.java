@@ -56,7 +56,9 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.services.tasks.Tasks;
 import com.google.api.services.tasks.TasksScopes;
+import com.hilton.todo.R;
 import com.hilton.todo.Task.ProjectionIndex;
 import com.hilton.todo.Task.TaskColumns;
 import com.hilton.todo.TodayTaskListView.DropListener;
@@ -67,8 +69,9 @@ public class TodayActivity extends Activity {
     private static final int VIEW_HISTORY = 11;
     private static final int REORDER = 12;
     private static final int SYNC_GOOGLE_TASK = 13;
-    private static final int REQUEST_CODE_GOOGLE_PLAY_SERVICES = 100;
+    static final int REQUEST_CODE_GOOGLE_PLAY_SERVICES = 100;
     private static final int REQUEST_CODE_ACCOUNT_PICKER = 101;
+    static final int REQUEST_CODE_AUTHORIZATION = 102;
     private static final String PREF_ACCOUNT_NAME = "accountName";
     
     private TodayTaskListView mTaskList;
@@ -353,8 +356,8 @@ public class TodayActivity extends Activity {
 	    mCredential = GoogleAccountCredential.usingOAuth2(this, TasksScopes.TASKS);
 	}
 	if (mTaskService == null) {
-	    mTaskService = new com.google.api.services.tasks.Tasks.Builder(transport, jsonFactory, mCredential)
-	    		.setApplicationName("Google-TasksAndroidSample/1.0").build();
+	    mTaskService = new Tasks.Builder(transport, jsonFactory, mCredential)
+	    		.setApplicationName("NotTomorrow").build();
 	}
 	SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
 	mCredential.setSelectedAccountName(settings.getString(PREF_ACCOUNT_NAME, null));
@@ -386,12 +389,19 @@ public class TodayActivity extends Activity {
 		}
 	    }
 	    break;
+	case REQUEST_CODE_AUTHORIZATION:
+	    if (resultCode == Activity.RESULT_OK) {
+		doSynchronization();
+	    } else {
+		startActivityForResult(mCredential.newChooseAccountIntent(), REQUEST_CODE_ACCOUNT_PICKER);
+	    }
+	    break;
 	}
     }
 
     private void doSynchronization() {
 	Log.e(TAG, "lalallala, let do synchronization");
-	new AsyncTasksLoader(this).execute();
+	new AsyncTasksLoader(this, mTaskService).execute();
     }
 
     private boolean checkGooglePlayServicesAvailability() {
