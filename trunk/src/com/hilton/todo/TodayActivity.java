@@ -391,6 +391,7 @@ public class TodayActivity extends Activity {
 
     private void doSynchronization() {
 	Log.e(TAG, "lalallala, let do synchronization");
+	new AsyncTasksLoader(this).execute();
     }
 
     private boolean checkGooglePlayServicesAvailability() {
