@@ -172,8 +172,6 @@ public class TodayActivity extends Activity {
 	    }
         });
         mConnectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        
-
     }
 
     @Override
