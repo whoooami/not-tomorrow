@@ -268,7 +268,7 @@ public class TaskHistoryActivity extends ExpandableListActivity {
 			final ContentValues values = new ContentValues(2);
 			values.put(TaskColumns.TYPE, TaskStore.TYPE_TODAY);
 			final Calendar today = new GregorianCalendar();
-			values.put(TaskColumns.MODIFIED,
+			values.put(TaskColumns.CREATED,
 				today.getTimeInMillis());
 			values.put(TaskColumns.DAY,
 				today.get(Calendar.DAY_OF_YEAR));
@@ -330,7 +330,7 @@ public class TaskHistoryActivity extends ExpandableListActivity {
         	mId = cursor.getInt(ProjectionIndex.ID);
         	mTaskLabel = cursor.getString(ProjectionIndex.TASK);
         	mFinished = cursor.getInt(ProjectionIndex.DONE);
-        	mModified = cursor.getLong(ProjectionIndex.MODIFIED);
+        	mModified = cursor.getLong(ProjectionIndex.CREATED);
         	mDay = cursor.getInt(ProjectionIndex.DAY);
             }
             

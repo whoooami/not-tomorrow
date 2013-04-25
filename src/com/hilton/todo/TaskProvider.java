@@ -15,21 +15,20 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.hilton.todo.TaskStore.TaskColumns;
 
 public class TaskProvider extends ContentProvider {
     public static final String AUTHORITY = "com.hilton.todo.TaskProvider";
     public static final String TABLE_NAME = "tasks";
-    public static final String DEFAULT_SORT_ORDER = "modified DESC";
+    public static final String DEFAULT_SORT_ORDER = TaskColumns.CREATED + " DESC";
     
     private static final int URI_MATCH_TASK = 1;
     private static final int URI_MATCH_TASK_ID = 11;
     
     private static final UriMatcher URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
     private static final String DATABASE_NAME = "todo.db";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
     private static final String TAG = "TaskProvider";
     static {
         URI_MATCHER.addURI(AUTHORITY, TABLE_NAME, URI_MATCH_TASK);
@@ -80,9 +79,9 @@ public class TaskProvider extends ContentProvider {
         if (uriMatch == -1) {
             throw new IllegalArgumentException("Query bad uri " + uri);
         }
-        if (values.getAsLong(TaskColumns.MODIFIED) == null) {
+        if (values.getAsLong(TaskColumns.CREATED) == null) {
             final Calendar today = new GregorianCalendar();
-            values.put(TaskColumns.MODIFIED, today.getTimeInMillis());
+            values.put(TaskColumns.CREATED, today.getTimeInMillis());
             values.put(TaskColumns.DAY, today.get(Calendar.DAY_OF_YEAR));
         }
         final long id = mDatabaseHelper.getWritableDatabase().insert(TABLE_NAME, TaskColumns.TASK, values);
@@ -158,7 +157,7 @@ public class TaskProvider extends ContentProvider {
                     TaskColumns.DONE + " SHORT DEFAULT 0, " +
                     TaskColumns.TASK + " TEXT, " +
                     TaskColumns.TYPE + " INTEGER DEFAULT 1, " +
-                    TaskColumns.MODIFIED + " DATE, " +
+                    TaskColumns.CREATED + " DATE, " +
                     TaskColumns.DAY + " INTEGER);");
         }
 

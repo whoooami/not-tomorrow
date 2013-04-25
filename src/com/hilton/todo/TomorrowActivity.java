@@ -79,7 +79,7 @@ public class TomorrowActivity extends Activity {
         		tomorrow.set(Calendar.HOUR_OF_DAY, 00);
         		tomorrow.set(Calendar.MINUTE, 00);
         		tomorrow.set(Calendar.SECOND, ++sTaskOrder);
-        		values.put(TaskColumns.MODIFIED, tomorrow.getTimeInMillis());
+        		values.put(TaskColumns.CREATED, tomorrow.getTimeInMillis());
         		values.put(TaskColumns.DAY, tomorrow.get(Calendar.DAY_OF_YEAR));
         		getContentResolver().insert(TaskStore.CONTENT_URI, values);
         	    }
@@ -201,7 +201,7 @@ public class TomorrowActivity extends Activity {
 	    	    final ContentValues values = new ContentValues(2);
 	    	    values.put(TaskColumns.TYPE, TaskStore.TYPE_TODAY);
 	    	    final Calendar today = new GregorianCalendar();
-	    	    values.put(TaskColumns.MODIFIED, today.getTimeInMillis());
+	    	    values.put(TaskColumns.CREATED, today.getTimeInMillis());
 	    	    values.put(TaskColumns.DAY, today.get(Calendar.DAY_OF_YEAR));
 	    	    getContentResolver().update(uri, values, null, null);
 	    	    Toast.makeText(getApplication(), getString(R.string.move_to_today_tip).replace("#", taskContent), Toast.LENGTH_SHORT).show();
