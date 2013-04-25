@@ -11,7 +11,6 @@ public class TaskStore {
         TaskColumns.TYPE,
         TaskColumns.MODIFIED,
         TaskColumns.DAY,
-//        TaskColumns.PRIORITY,
     };
     
     public static final class ProjectionIndex {
@@ -21,7 +20,6 @@ public class TaskStore {
         public static final int TYPE = 3;
         public static final int MODIFIED = 4;
         public static final int DAY = 5;
-//        public static final int PRIORITY = 6;
     }
     
     public static class TaskColumns {
@@ -40,13 +38,4 @@ public class TaskStore {
     public static final int TYPE_TODAY = 1;
     public static final int TYPE_TOMORROW = 2;
     public static final int TYPE_HISTORY = 3;
-    
-    private static int sPriority = 0;
-    public static int getPriority() {
-	return ++sPriority;
-    }
-    
-    public static void resetPriority() {
-	sPriority = 0;
-    }
 }
