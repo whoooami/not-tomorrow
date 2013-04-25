@@ -40,8 +40,8 @@ import android.widget.Toast;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 
-import com.hilton.todo.Task.ProjectionIndex;
-import com.hilton.todo.Task.TaskColumns;
+import com.hilton.todo.TaskStore.ProjectionIndex;
+import com.hilton.todo.TaskStore.TaskColumns;
 
 public class TaskHistoryActivity extends ExpandableListActivity {
     public static final String HISTORY_PERIOD_CHOICE = "history_period_choice";
@@ -57,8 +57,8 @@ public class TaskHistoryActivity extends ExpandableListActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.white)));
-        final Cursor cursor = getContentResolver().query(Task.CONTENT_URI, Task.PROJECTION, TaskColumns.TYPE + " = ?", 
-        	new String[]{String.valueOf(Task.TYPE_HISTORY)}, TaskColumns.DAY + " DESC");
+        final Cursor cursor = getContentResolver().query(TaskStore.CONTENT_URI, TaskStore.PROJECTION, TaskColumns.TYPE + " = ?", 
+        	new String[]{String.valueOf(TaskStore.TYPE_HISTORY)}, TaskColumns.DAY + " DESC");
         mAdapter = new TaskHistoryExpandableListAdapter(getApplication(), cursor);
         setListAdapter(mAdapter);
         final ExpandableListView list = getExpandableListView();
@@ -132,7 +132,7 @@ public class TaskHistoryActivity extends ExpandableListActivity {
     }
     
     private void clearHistory() {
-	getContentResolver().delete(Task.CONTENT_URI, TaskColumns.TYPE + " = " + Task.TYPE_HISTORY, null);
+	getContentResolver().delete(TaskStore.CONTENT_URI, TaskColumns.TYPE + " = " + TaskStore.TYPE_HISTORY, null);
     }
     
     public class TaskHistoryExpandableListAdapter extends BaseExpandableListAdapter {
@@ -264,9 +264,9 @@ public class TaskHistoryActivity extends ExpandableListActivity {
 		    @Override
 		    public void onClick(View v) {
 			final Uri uri = ContentUris.withAppendedId(
-				Task.CONTENT_URI, getChildId(groupPosition, childPosition));
+				TaskStore.CONTENT_URI, getChildId(groupPosition, childPosition));
 			final ContentValues values = new ContentValues(2);
-			values.put(TaskColumns.TYPE, Task.TYPE_TODAY);
+			values.put(TaskColumns.TYPE, TaskStore.TYPE_TODAY);
 			final Calendar today = new GregorianCalendar();
 			values.put(TaskColumns.MODIFIED,
 				today.getTimeInMillis());

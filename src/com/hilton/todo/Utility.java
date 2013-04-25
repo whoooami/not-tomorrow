@@ -15,7 +15,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 
-import com.hilton.todo.Task.TaskColumns;
+import com.hilton.todo.TaskStore.TaskColumns;
 
 public class Utility {
     public static void deleteObseleteTasks(Context context) {
@@ -24,8 +24,8 @@ public class Utility {
 	final Calendar today = new GregorianCalendar();
 	int day = today.get(Calendar.DAY_OF_YEAR);
 	int firstDay = day - period;
-	context.getContentResolver().delete(Task.CONTENT_URI, 
-		TaskColumns.TYPE + " = " + Task.TYPE_HISTORY + " AND " + TaskColumns.DAY + " < " + firstDay, 
+	context.getContentResolver().delete(TaskStore.CONTENT_URI, 
+		TaskColumns.TYPE + " = " + TaskStore.TYPE_HISTORY + " AND " + TaskColumns.DAY + " < " + firstDay, 
 		null);
     }
 
@@ -33,10 +33,10 @@ public class Utility {
 	final Calendar today = new GregorianCalendar();
 	int day = today.get(Calendar.DAY_OF_YEAR);
 	final ContentValues values = new ContentValues(1);
-	values.put(TaskColumns.TYPE, Task.TYPE_HISTORY);
-	context.getContentResolver().update(Task.CONTENT_URI, values, TaskColumns.DAY + " < " + day, null);
-	values.put(TaskColumns.TYPE, Task.TYPE_TODAY);
-	context.getContentResolver().update(Task.CONTENT_URI, values, TaskColumns.DAY + " = " + day, null);
+	values.put(TaskColumns.TYPE, TaskStore.TYPE_HISTORY);
+	context.getContentResolver().update(TaskStore.CONTENT_URI, values, TaskColumns.DAY + " < " + day, null);
+	values.put(TaskColumns.TYPE, TaskStore.TYPE_TODAY);
+	context.getContentResolver().update(TaskStore.CONTENT_URI, values, TaskColumns.DAY + " = " + day, null);
 	
 	deleteObseleteTasks(context);
     }

@@ -59,8 +59,8 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.tasks.Tasks;
 import com.google.api.services.tasks.TasksScopes;
 import com.hilton.todo.R;
-import com.hilton.todo.Task.ProjectionIndex;
-import com.hilton.todo.Task.TaskColumns;
+import com.hilton.todo.TaskStore.ProjectionIndex;
+import com.hilton.todo.TaskStore.TaskColumns;
 import com.hilton.todo.TodayTaskListView.DropListener;
 
 public class TodayActivity extends Activity {
@@ -112,15 +112,15 @@ public class TodayActivity extends Activity {
         	    if (!TextUtils.isEmpty(text)) {
         		final ContentValues values = new ContentValues(1);
         		values.put(TaskColumns.TASK, text);
-        		values.put(TaskColumns.TYPE, Task.TYPE_TODAY);
-        		getContentResolver().insert(Task.CONTENT_URI, values);
+        		values.put(TaskColumns.TYPE, TaskStore.TYPE_TODAY);
+        		getContentResolver().insert(TaskStore.CONTENT_URI, values);
         	    }
         	    mAddTaskEditor.setText("");
         	}
         	return false;
             }
         });
-        final Cursor cursor = getContentResolver().query(Task.CONTENT_URI, Task.PROJECTION, TaskColumns.TYPE + " = " + Task.TYPE_TODAY, null, null);
+        final Cursor cursor = getContentResolver().query(TaskStore.CONTENT_URI, TaskStore.PROJECTION, TaskColumns.TYPE + " = " + TaskStore.TYPE_TODAY, null, null);
         final TaskAdapter adapter = new TaskAdapter(getApplication(), cursor);
         mTaskList.setAdapter(adapter);
         mSwitchGestureListener = new SwitchGestureListener();
@@ -154,14 +154,14 @@ public class TodayActivity extends Activity {
 		    Log.e(TAG, "----------------src cursor and current row of source cursor");
 		    android.database.DatabaseUtils.dumpCurrentRow(src);
 		    long srcModified = src.getLong(ProjectionIndex.MODIFIED);
-		    final Uri srcUri = ContentUris.withAppendedId(Task.CONTENT_URI, src.getLong(ProjectionIndex.ID));
+		    final Uri srcUri = ContentUris.withAppendedId(TaskStore.CONTENT_URI, src.getLong(ProjectionIndex.ID));
 		    Log.e(TAG, "src uri " + srcUri);
 
 		    Log.e(TAG, "----------------dst cursor and current row of dst currsor");
 		    final Cursor dst = (Cursor) mTaskList.getItemAtPosition(to);
 		    android.database.DatabaseUtils.dumpCurrentRow(dst);
 		    long dstModified = dst.getLong(ProjectionIndex.MODIFIED);
-		    final Uri dstUri = ContentUris.withAppendedId(Task.CONTENT_URI, dst.getLong(ProjectionIndex.ID));
+		    final Uri dstUri = ContentUris.withAppendedId(TaskStore.CONTENT_URI, dst.getLong(ProjectionIndex.ID));
 		    Log.e(TAG, "\t\t, dst uri " + dstUri);
 		    Log.e(TAG, "srcm " + srcModified + ", dstM " + dstModified);
 		    
@@ -187,7 +187,7 @@ public class TodayActivity extends Activity {
     @Override
     public boolean onContextItemSelected(MenuItem item) {
 	AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-	final Uri uri = ContentUris.withAppendedId(Task.CONTENT_URI, info.id);
+	final Uri uri = ContentUris.withAppendedId(TaskStore.CONTENT_URI, info.id);
 	switch (item.getItemId()) {
 	case R.id.today_list_contextmenu_delete:
 	    getContentResolver().delete(uri, null, null);
@@ -215,7 +215,7 @@ public class TodayActivity extends Activity {
 	}
 	case R.id.today_list_contextmenu_push: {
     	    final ContentValues values = new ContentValues(2);
-    	    values.put(TaskColumns.TYPE, Task.TYPE_TOMORROW);
+    	    values.put(TaskColumns.TYPE, TaskStore.TYPE_TOMORROW);
     	    final Calendar today = new GregorianCalendar();
     	    today.add(Calendar.DAY_OF_YEAR, 1);
     	    values.put(TaskColumns.MODIFIED, today.getTimeInMillis());
@@ -242,7 +242,7 @@ public class TodayActivity extends Activity {
 	    return;
 	}
 	getMenuInflater().inflate(R.menu.today_contextmenu, menu);
-	final Uri uri = ContentUris.withAppendedId(Task.CONTENT_URI, id);
+	final Uri uri = ContentUris.withAppendedId(TaskStore.CONTENT_URI, id);
 	final String task = getTaskContent(uri);
         menu.setHeaderTitle(task);
 	super.onCreateContextMenu(menu, v, menuInfo);
@@ -448,7 +448,7 @@ public class TodayActivity extends Activity {
             final CheckBox toggle = (CheckBox) view.findViewById(R.id.action_toggle_done);
             final short done = cursor.getShort(ProjectionIndex.DONE);
             final int id = cursor.getInt(ProjectionIndex.ID);
-            final Uri uri = ContentUris.withAppendedId(Task.CONTENT_URI, id);
+            final Uri uri = ContentUris.withAppendedId(TaskStore.CONTENT_URI, id);
             final String taskContent = cursor.getString(ProjectionIndex.TASK);
             /*
              * 1. bindView will be called every time refresh the UI, so onCheckedChangedListener will be changed to the last one set.
