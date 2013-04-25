@@ -32,7 +32,7 @@ public class TaskStore {
         /** the day of the year on which task is created */
         // TODO: there is a bug, if we are at end of a year, day-of-year is not reliable any more
         public static final String DAY = "day";
-        public static final String PRIORITY = "priority";
+        public static final String MODIFIED = "modified";
     }
     
     public static final int TYPE_TODAY = 1;

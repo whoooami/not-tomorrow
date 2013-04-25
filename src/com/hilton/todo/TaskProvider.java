@@ -15,6 +15,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.hilton.todo.TaskStore.TaskColumns;
 
@@ -28,7 +29,7 @@ public class TaskProvider extends ContentProvider {
     
     private static final UriMatcher URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
     private static final String DATABASE_NAME = "todo.db";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
     private static final String TAG = "TaskProvider";
     static {
         URI_MATCHER.addURI(AUTHORITY, TABLE_NAME, URI_MATCH_TASK);
@@ -81,8 +82,10 @@ public class TaskProvider extends ContentProvider {
         }
         if (values.getAsLong(TaskColumns.CREATED) == null) {
             final Calendar today = new GregorianCalendar();
-            values.put(TaskColumns.CREATED, today.getTimeInMillis());
+            final long millis = today.getTimeInMillis();
+            values.put(TaskColumns.CREATED, millis);
             values.put(TaskColumns.DAY, today.get(Calendar.DAY_OF_YEAR));
+            values.put(TaskColumns.MODIFIED, millis);
         }
         final long id = mDatabaseHelper.getWritableDatabase().insert(TABLE_NAME, TaskColumns.TASK, values);
         getContext().getContentResolver().notifyChange(TaskStore.CONTENT_URI, null);
@@ -158,7 +161,8 @@ public class TaskProvider extends ContentProvider {
                     TaskColumns.TASK + " TEXT, " +
                     TaskColumns.TYPE + " INTEGER DEFAULT 1, " +
                     TaskColumns.CREATED + " DATE, " +
-                    TaskColumns.DAY + " INTEGER);");
+                    TaskColumns.DAY + " INTEGER, " +
+                    TaskColumns.MODIFIED + " DATE);");
         }
 
         @Override

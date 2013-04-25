@@ -195,6 +195,7 @@ public class TodayActivity extends Activity {
 	    return true;
 	case R.id.today_list_contextmenu_edit: {
 	    final View textEntryView = mFactory.inflate(R.layout.dialog_edit_task, null);
+	    final String content = getTaskContent(uri);
 	    mDialogEditTask = new AlertDialog.Builder(TodayActivity.this)
 	    .setIcon(android.R.drawable.ic_dialog_alert)
 	    .setTitle(R.string.dialog_edit_title)
@@ -202,8 +203,13 @@ public class TodayActivity extends Activity {
 	    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 		public void onClick(DialogInterface dialog, int whichButton) {
 		    final EditText box = (EditText) mDialogEditTask.findViewById(R.id.edit_box);
+		    final String newContent = box.getText().toString();
+		    if (content.equals(newContent)) {
+			return;
+		    }
 		    final ContentValues cv = new ContentValues();
 		    cv.put(TaskColumns.TASK, box.getText().toString());
+		    cv.put(TaskColumns.MODIFIED, new GregorianCalendar().getTimeInMillis());
 		    getContentResolver().update(uri, cv, null, null);
 		}
 	    })
@@ -211,7 +217,7 @@ public class TodayActivity extends Activity {
 	    .create();
 	    mDialogEditTask.show();
 	    EditText box = (EditText) mDialogEditTask.findViewById(R.id.edit_box);
-	    box.setText(getTaskContent(uri));
+	    box.setText(content);
 	    return true;
 	}
 	case R.id.today_list_contextmenu_push: {
@@ -465,6 +471,7 @@ public class TodayActivity extends Activity {
         	public void onCheckedChanged(CompoundButton view, boolean checked) {
         	    final ContentValues values = new ContentValues(1);
         	    values.put(TaskColumns.DONE, checked ? 1 : 0);
+        	    values.put(TaskColumns.MODIFIED, new GregorianCalendar().getTimeInMillis());
         	    getContentResolver().update(uri, values, null, null);
         	}
 
