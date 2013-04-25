@@ -162,7 +162,8 @@ public class TaskProvider extends ContentProvider {
                     TaskColumns.TYPE + " INTEGER DEFAULT 1, " +
                     TaskColumns.CREATED + " DATE, " +
                     TaskColumns.DAY + " INTEGER, " +
-                    TaskColumns.MODIFIED + " DATE);");
+                    TaskColumns.MODIFIED + " DATE, " +
+                    TaskColumns.GOOGLE_TASK_ID + " TEXT);");
         }
 
         @Override

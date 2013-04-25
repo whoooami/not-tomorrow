@@ -33,6 +33,7 @@ public class TaskStore {
         // TODO: there is a bug, if we are at end of a year, day-of-year is not reliable any more
         public static final String DAY = "day";
         public static final String MODIFIED = "modified";
+        public static final String GOOGLE_TASK_ID = "google_task_id";
     }
     
     public static final int TYPE_TODAY = 1;
