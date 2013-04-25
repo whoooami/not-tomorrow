@@ -40,35 +40,24 @@ public class AsyncTasksLoader extends AsyncTask<Void, Void, Boolean> {
 	try {
 	    // step 1: read data of local
 	    final List<TaskWrapper> localTasks = getLocalTasks();
-	    for (TaskWrapper t : localTasks) {
-		Log.e(TAG, "look at local tasks: " + t);
-	    }
+	    // step 2: get data from server
 	    TasksOperations.List operatorList = mTaskService.tasks().list("@default");
-	    final List<Task> tasks = operatorList.execute().getItems();
-	    final ContentValues cv = new ContentValues();
-	    if (tasks != null) {
-		for (Task t : tasks) {
-		    Log.e(TAG, "\t\tgot task: '" + t.getTitle() + ", updated " + t.getUpdated().getValue() + 
-			    ", complted " + t.getCompleted() + ", deleted " + t.getDeleted() + " id " + t.getId() +
-			    ", due " + t.getDue() + ", status " + t.getStatus());
-		    if (t.getDeleted() != null && t.getDeleted()) {
-			continue;
-		    }
-		    if (TextUtils.isEmpty(t.getTitle())) {
-			continue;
-		    }
-		    final long updated = t.getUpdated().getValue();
-		    final Calendar date = new GregorianCalendar();
-		    date.setTimeInMillis(updated);
-		    cv.clear();
-		    cv.put(TaskColumns.TASK, t.getTitle());
-		    cv.put(TaskColumns.DONE, (t.getCompleted() == null ? 0 : 1));
-		    cv.put(TaskColumns.CREATED, t.getUpdated().getValue());
-		    cv.put(TaskColumns.DAY, date.get(Calendar.DAY_OF_YEAR));
-		    cv.put(TaskColumns.TYPE, TaskStore.TYPE_TODAY);
-		    mActivity.getContentResolver().insert(TaskStore.CONTENT_URI, cv);
+	    List<Task> serverTasks = operatorList.execute().getItems();
+	    if (serverTasks == null) {
+		serverTasks = new ArrayList<Task>();
+	    }
+	    // step 3: do synchronization by Id as primary key
+	    // phase A: iterate localTasks and merge: add to server, update to server and update database and delete processed tasks
+	    for (final TaskWrapper t : localTasks) {
+		if (t.idIsNull()) {
+		    Log.e(TAG, "orginal local task is " + t);
+		    // push to server
+		    final Task newTask = mTaskService.tasks().insert("@default", t.getTask()).execute();
+		    printTask(newTask);
+		    t.updateTask(newTask, mActivity.getContentResolver());
 		}
 	    }
+	    // phase B: iterate serverTasks and merge into database
 	    return true;
 	} catch (final GooglePlayServicesAvailabilityIOException availabilityException) {
 	    final Dialog dialog = GooglePlayServicesUtil.getErrorDialog(availabilityException.getConnectionStatusCode(),
@@ -80,6 +69,21 @@ public class AsyncTasksLoader extends AsyncTask<Void, Void, Boolean> {
 	    Log.e(TAG, "exception caught, ", e);
 	}
 	return false;
+    }
+
+    private void printTask(Task t) {
+	final StringBuilder sb = new StringBuilder();
+	sb.append("Task {\n");
+	sb.append("title : " + t.getTitle());
+	sb.append("\n id: " + t.getId());
+	sb.append("\n updated: " + t.getUpdated());
+	sb.append("\n completed: " + t.getCompleted());
+	sb.append("\n deleted: " + t.getDeleted());
+	sb.append("\n due: " + t.getDue());
+	sb.append("\n status: " + t.getStatus());
+	sb.append("}\n");
+	Log.e(TAG, "\t\tgot task: '" + sb.toString());
+	Log.e(TAG, "original task " + t);
     }
 
     private List<TaskWrapper> getLocalTasks() {
