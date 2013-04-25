@@ -46,6 +46,11 @@ public class TaskWrapper {
     }
     
     public void updateTask(Task t, ContentResolver cr) {
+	final ContentValues cv = extraValues(t);
+	cr.update(mUri, cv, null, null);
+    }
+
+    public static ContentValues extraValues(Task t) {
 	final ContentValues cv = new ContentValues();
 	cv.put(TaskColumns.TASK, t.getTitle());
 	cv.put(TaskColumns.GOOGLE_TASK_ID, t.getId());
@@ -60,7 +65,7 @@ public class TaskWrapper {
 	    type = today.get(Calendar.DAY_OF_YEAR) < due.get(Calendar.DAY_OF_YEAR) ? TaskStore.TYPE_TOMORROW : TaskStore.TYPE_TODAY;
 	}
 	cv.put(TaskColumns.TYPE, type);
-	cr.update(mUri, cv, null, null);
+	return cv;
     }
     
     public void mergeInto(Task t) {
