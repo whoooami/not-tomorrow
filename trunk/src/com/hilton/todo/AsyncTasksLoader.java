@@ -55,6 +55,23 @@ public class AsyncTasksLoader extends AsyncTask<Void, Void, Boolean> {
 		    final Task newTask = mTaskService.tasks().insert("@default", t.getTask()).execute();
 		    printTask(newTask);
 		    t.updateTask(newTask, mActivity.getContentResolver());
+		} else {
+		    final Task st = findTaskWithId(serverTasks, t.getId());
+		    if (st == null) {
+			continue;
+		    }
+		    if (t.isNewerThan(st)) {
+			if (t.isDeleted()) {
+			    mTaskService.tasks().delete("@default", st.getId()).execute();
+			} else {
+			    // TODO: update cannot work, bad request
+			    t.mergeInto(st);
+			    final Task ut = mTaskService.tasks().update("@default", st.getId(), st).execute();
+			    // TOCHEKCK: ut should be the same to t.getTask and different from st
+			}
+		    } else {
+			t.updateTask(st, mActivity.getContentResolver());
+		    }
 		}
 	    }
 	    // phase B: iterate serverTasks and merge into database
@@ -69,6 +86,15 @@ public class AsyncTasksLoader extends AsyncTask<Void, Void, Boolean> {
 	    Log.e(TAG, "exception caught, ", e);
 	}
 	return false;
+    }
+
+    private Task findTaskWithId(List<Task> serverTasks, String id) {
+	for (Task t : serverTasks) {
+	    if (id.equals(t.getId())) {
+		return t;
+	    }
+	}
+	return null;
     }
 
     private void printTask(Task t) {

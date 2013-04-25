@@ -63,6 +63,26 @@ public class TaskWrapper {
 	cr.update(mUri, cv, null, null);
     }
     
+    public void mergeInto(Task t) {
+	t.setTitle(mTask.getTitle());
+	t.setCompleted(mTask.getCompleted());
+	t.setDeleted(mTask.getDeleted());
+	t.setDue(mTask.getDue());
+	t.setUpdated(mTask.getUpdated());
+    }
+    
+    public boolean isDeleted() {
+	return mTask.getDeleted();
+    }
+    
+    public boolean isNewerThan(final Task t) {
+	return mTask.getUpdated().getValue() > t.getUpdated().getValue();
+    }
+    
+    public String getId() {
+	return mTask.getId();
+    }
+    
     public Task getTask() {
 	return mTask;
     }
