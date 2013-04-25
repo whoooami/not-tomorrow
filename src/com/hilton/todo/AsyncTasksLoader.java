@@ -51,8 +51,9 @@ public class AsyncTasksLoader extends AsyncTask<Void, Void, Boolean> {
 	    final ContentValues cv = new ContentValues();
 	    if (tasks != null) {
 		for (Task t : tasks) {
-		    Log.e(TAG, "\t\tgot task: '" + t.getTitle() + ", updated " + 
-			    t.getUpdated().getValue() + ", complted " + t.getCompleted() + ", deleted " + t.getDeleted());
+		    Log.e(TAG, "\t\tgot task: '" + t.getTitle() + ", updated " + t.getUpdated().getValue() + 
+			    ", complted " + t.getCompleted() + ", deleted " + t.getDeleted() + " id " + t.getId() +
+			    ", due " + t.getDue() + ", status " + t.getStatus());
 		    if (t.getDeleted() != null && t.getDeleted()) {
 			continue;
 		    }
