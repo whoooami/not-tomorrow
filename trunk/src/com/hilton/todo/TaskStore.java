@@ -2,7 +2,7 @@ package com.hilton.todo;
 
 import android.net.Uri;
 
-public class Task {
+public class TaskStore {
     public static final Uri CONTENT_URI = Uri.parse("content://" + TaskProvider.AUTHORITY + "/" + TaskProvider.TABLE_NAME);
     public static final String PROJECTION[] = new String[] {
         TaskColumns._ID,

@@ -3,7 +3,6 @@ package com.hilton.todo;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -24,8 +23,8 @@ import com.google.api.client.util.DateTime;
 import com.google.api.services.tasks.Tasks;
 import com.google.api.services.tasks.Tasks.TasksOperations;
 import com.google.api.services.tasks.model.Task;
-import com.hilton.todo.Task.ProjectionIndex;
-import com.hilton.todo.Task.TaskColumns;
+import com.hilton.todo.TaskStore.ProjectionIndex;
+import com.hilton.todo.TaskStore.TaskColumns;
 
 public class AsyncTasksLoader extends AsyncTask<Void, Void, Boolean> {
     private static final String TAG = "AsyncTasksLoader";
@@ -68,8 +67,8 @@ public class AsyncTasksLoader extends AsyncTask<Void, Void, Boolean> {
 		    cv.put(TaskColumns.DONE, (t.getCompleted() == null ? 0 : 1));
 		    cv.put(TaskColumns.MODIFIED, t.getUpdated().getValue());
 		    cv.put(TaskColumns.DAY, date.get(Calendar.DAY_OF_YEAR));
-		    cv.put(TaskColumns.TYPE, com.hilton.todo.Task.TYPE_TODAY);
-		    mActivity.getContentResolver().insert(com.hilton.todo.Task.CONTENT_URI, cv);
+		    cv.put(TaskColumns.TYPE, TaskStore.TYPE_TODAY);
+		    mActivity.getContentResolver().insert(TaskStore.CONTENT_URI, cv);
 		}
 	    }
 	    return true;
@@ -86,9 +85,9 @@ public class AsyncTasksLoader extends AsyncTask<Void, Void, Boolean> {
     }
 
     private List<Task> getLocalTasks() {
-	final Cursor c = mActivity.getContentResolver().query(com.hilton.todo.Task.CONTENT_URI, 
-	    com.hilton.todo.Task.PROJECTION, TaskColumns.TYPE + "=?", 
-	    new String[]{String.valueOf(com.hilton.todo.Task.TYPE_TODAY)}, null);
+	final Cursor c = mActivity.getContentResolver().query(TaskStore.CONTENT_URI, 
+	    TaskStore.PROJECTION, TaskColumns.TYPE + "=?", 
+	    new String[]{String.valueOf(TaskStore.TYPE_TODAY)}, null);
 	List<Task> tasks = new ArrayList<Task>();
 	if (c == null) {
 	    return tasks;

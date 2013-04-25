@@ -17,7 +17,7 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.hilton.todo.Task.TaskColumns;
+import com.hilton.todo.TaskStore.TaskColumns;
 
 public class TaskProvider extends ContentProvider {
     public static final String AUTHORITY = "com.hilton.todo.TaskProvider";
@@ -58,7 +58,7 @@ public class TaskProvider extends ContentProvider {
             where.append(") ");
         }
         final int count = mDatabaseHelper.getWritableDatabase().delete(TABLE_NAME, where.toString(), args); 
-        getContext().getContentResolver().notifyChange(Task.CONTENT_URI, null);
+        getContext().getContentResolver().notifyChange(TaskStore.CONTENT_URI, null);
         return count;
     }
 
@@ -86,8 +86,8 @@ public class TaskProvider extends ContentProvider {
             values.put(TaskColumns.DAY, today.get(Calendar.DAY_OF_YEAR));
         }
         final long id = mDatabaseHelper.getWritableDatabase().insert(TABLE_NAME, TaskColumns.TASK, values);
-        getContext().getContentResolver().notifyChange(Task.CONTENT_URI, null);
-        return ContentUris.withAppendedId(Task.CONTENT_URI, id);
+        getContext().getContentResolver().notifyChange(TaskStore.CONTENT_URI, null);
+        return ContentUris.withAppendedId(TaskStore.CONTENT_URI, id);
     }
 
     @Override
@@ -138,7 +138,7 @@ public class TaskProvider extends ContentProvider {
         }
 //        values.put(TaskColumns.MODIFIED, new Date().getTime());
         final int count = mDatabaseHelper.getWritableDatabase().update(TABLE_NAME, values, where.toString(), args);
-        getContext().getContentResolver().notifyChange(Task.CONTENT_URI, null);
+        getContext().getContentResolver().notifyChange(TaskStore.CONTENT_URI, null);
         return count;
     }
     

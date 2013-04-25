@@ -36,8 +36,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.hilton.todo.Task.ProjectionIndex;
-import com.hilton.todo.Task.TaskColumns;
+import com.hilton.todo.TaskStore.ProjectionIndex;
+import com.hilton.todo.TaskStore.TaskColumns;
 
 public class TomorrowActivity extends Activity {
     protected static final String TAG = "TomorrowActivity";
@@ -73,7 +73,7 @@ public class TomorrowActivity extends Activity {
         	    if (!TextUtils.isEmpty(text)) {
         		final ContentValues values = new ContentValues(1);
         		values.put(TaskColumns.TASK, text);
-        		values.put(TaskColumns.TYPE, Task.TYPE_TOMORROW);
+        		values.put(TaskColumns.TYPE, TaskStore.TYPE_TOMORROW);
         		final Calendar tomorrow = new GregorianCalendar();
         		tomorrow.add(Calendar.DAY_OF_YEAR, 1);
         		tomorrow.set(Calendar.HOUR_OF_DAY, 00);
@@ -81,14 +81,14 @@ public class TomorrowActivity extends Activity {
         		tomorrow.set(Calendar.SECOND, ++sTaskOrder);
         		values.put(TaskColumns.MODIFIED, tomorrow.getTimeInMillis());
         		values.put(TaskColumns.DAY, tomorrow.get(Calendar.DAY_OF_YEAR));
-        		getContentResolver().insert(Task.CONTENT_URI, values);
+        		getContentResolver().insert(TaskStore.CONTENT_URI, values);
         	    }
         	    mAddTaskEditor.setText("");
         	}
         	return false;
             }
         });
-        final Cursor cursor = getContentResolver().query(Task.CONTENT_URI, Task.PROJECTION, TaskColumns.TYPE + " = " + Task.TYPE_TOMORROW, null, null);
+        final Cursor cursor = getContentResolver().query(TaskStore.CONTENT_URI, TaskStore.PROJECTION, TaskColumns.TYPE + " = " + TaskStore.TYPE_TOMORROW, null, null);
         final TaskAdapter adapter = new TaskAdapter(getApplication(), cursor);
         mTaskList.setAdapter(adapter);
         mGestureDetector = new GestureDetector(new SwitchGestureListener());
@@ -110,7 +110,7 @@ public class TomorrowActivity extends Activity {
     @Override
     public boolean onContextItemSelected(MenuItem item) {
 	AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-	final Uri uri = ContentUris.withAppendedId(Task.CONTENT_URI, info.id);
+	final Uri uri = ContentUris.withAppendedId(TaskStore.CONTENT_URI, info.id);
 	switch (item.getItemId()) {
 	case R.id.tomorrow_list_contextmenu_delete:
 	    getContentResolver().delete(uri, null, null);
@@ -150,7 +150,7 @@ public class TomorrowActivity extends Activity {
 	    return;
 	}
 	getMenuInflater().inflate(R.menu.tomorrow_contextmenu, menu);
-	final Uri uri = ContentUris.withAppendedId(Task.CONTENT_URI, id);
+	final Uri uri = ContentUris.withAppendedId(TaskStore.CONTENT_URI, id);
 	final String task = getTaskContent(uri);
         menu.setHeaderTitle(task);
 	super.onCreateContextMenu(menu, v, menuInfo);
@@ -193,13 +193,13 @@ public class TomorrowActivity extends Activity {
             final String taskContent = cursor.getString(ProjectionIndex.TASK);
             final short done = cursor.getShort(ProjectionIndex.DONE);
             final int id = cursor.getInt(ProjectionIndex.ID);
-            final Uri uri = ContentUris.withAppendedId(Task.CONTENT_URI, id);
+            final Uri uri = ContentUris.withAppendedId(TaskStore.CONTENT_URI, id);
             final ImageView move = (ImageView) view.findViewById(R.id.action_move_to_today);
             move.setOnClickListener(new OnClickListener() {
 	        @Override
 	        public void onClick(View v) {
 	    	    final ContentValues values = new ContentValues(2);
-	    	    values.put(TaskColumns.TYPE, Task.TYPE_TODAY);
+	    	    values.put(TaskColumns.TYPE, TaskStore.TYPE_TODAY);
 	    	    final Calendar today = new GregorianCalendar();
 	    	    values.put(TaskColumns.MODIFIED, today.getTimeInMillis());
 	    	    values.put(TaskColumns.DAY, today.get(Calendar.DAY_OF_YEAR));
