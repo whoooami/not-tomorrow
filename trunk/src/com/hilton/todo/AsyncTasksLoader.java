@@ -65,7 +65,7 @@ public class AsyncTasksLoader extends AsyncTask<Void, Void, Boolean> {
 		    cv.clear();
 		    cv.put(TaskColumns.TASK, t.getTitle());
 		    cv.put(TaskColumns.DONE, (t.getCompleted() == null ? 0 : 1));
-		    cv.put(TaskColumns.MODIFIED, t.getUpdated().getValue());
+		    cv.put(TaskColumns.CREATED, t.getUpdated().getValue());
 		    cv.put(TaskColumns.DAY, date.get(Calendar.DAY_OF_YEAR));
 		    cv.put(TaskColumns.TYPE, TaskStore.TYPE_TODAY);
 		    mActivity.getContentResolver().insert(TaskStore.CONTENT_URI, cv);
@@ -100,7 +100,7 @@ public class AsyncTasksLoader extends AsyncTask<Void, Void, Boolean> {
 	    Task t = new Task();
 	    t.setTitle(c.getString(ProjectionIndex.TASK));
 	    boolean done = c.getInt(ProjectionIndex.DONE) == 1;
-	    DateTime d = new DateTime(c.getLong(ProjectionIndex.MODIFIED));
+	    DateTime d = new DateTime(c.getLong(ProjectionIndex.CREATED));
 	    t.setCompleted(done ? d : null);
 	    t.setUpdated(d);
 	    tasks.add(t);

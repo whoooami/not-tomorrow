@@ -120,7 +120,8 @@ public class TodayActivity extends Activity {
         	return false;
             }
         });
-        final Cursor cursor = getContentResolver().query(TaskStore.CONTENT_URI, TaskStore.PROJECTION, TaskColumns.TYPE + " = " + TaskStore.TYPE_TODAY, null, null);
+        final Cursor cursor = getContentResolver().query(TaskStore.CONTENT_URI, TaskStore.PROJECTION, 
+        	TaskColumns.TYPE + " = " + TaskStore.TYPE_TODAY, null, null);
         final TaskAdapter adapter = new TaskAdapter(getApplication(), cursor);
         mTaskList.setAdapter(adapter);
         mSwitchGestureListener = new SwitchGestureListener();
@@ -153,23 +154,23 @@ public class TodayActivity extends Activity {
 		    final Cursor src = (Cursor) mTaskList.getItemAtPosition(from);
 		    Log.e(TAG, "----------------src cursor and current row of source cursor");
 		    android.database.DatabaseUtils.dumpCurrentRow(src);
-		    long srcModified = src.getLong(ProjectionIndex.MODIFIED);
+		    long srcModified = src.getLong(ProjectionIndex.CREATED);
 		    final Uri srcUri = ContentUris.withAppendedId(TaskStore.CONTENT_URI, src.getLong(ProjectionIndex.ID));
 		    Log.e(TAG, "src uri " + srcUri);
 
 		    Log.e(TAG, "----------------dst cursor and current row of dst currsor");
 		    final Cursor dst = (Cursor) mTaskList.getItemAtPosition(to);
 		    android.database.DatabaseUtils.dumpCurrentRow(dst);
-		    long dstModified = dst.getLong(ProjectionIndex.MODIFIED);
+		    long dstModified = dst.getLong(ProjectionIndex.CREATED);
 		    final Uri dstUri = ContentUris.withAppendedId(TaskStore.CONTENT_URI, dst.getLong(ProjectionIndex.ID));
 		    Log.e(TAG, "\t\t, dst uri " + dstUri);
 		    Log.e(TAG, "srcm " + srcModified + ", dstM " + dstModified);
 		    
 		    final ContentValues values = new ContentValues(1);
-		    values.put(TaskColumns.MODIFIED, dstModified);
+		    values.put(TaskColumns.CREATED, dstModified);
 		    getContentResolver().update(srcUri, values, null, null);
 		    values.clear();
-		    values.put(TaskColumns.MODIFIED, srcModified);
+		    values.put(TaskColumns.CREATED, srcModified);
 		    getContentResolver().update(dstUri, values, null, null);
 		    Log.e(TAG, "data swapped, are you aware of that");
 	    }
@@ -218,7 +219,7 @@ public class TodayActivity extends Activity {
     	    values.put(TaskColumns.TYPE, TaskStore.TYPE_TOMORROW);
     	    final Calendar today = new GregorianCalendar();
     	    today.add(Calendar.DAY_OF_YEAR, 1);
-    	    values.put(TaskColumns.MODIFIED, today.getTimeInMillis());
+    	    values.put(TaskColumns.CREATED, today.getTimeInMillis());
     	    values.put(TaskColumns.DAY, today.get(Calendar.DAY_OF_YEAR));
     	    getContentResolver().update(uri, values, null, null);
     	    Toast.makeText(getApplication(), getString(R.string.move_to_tomorrow_tip).replace("#", getTaskContent(uri)), 

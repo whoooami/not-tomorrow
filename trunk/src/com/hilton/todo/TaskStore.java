@@ -9,7 +9,7 @@ public class TaskStore {
         TaskColumns.DONE,
         TaskColumns.TASK,
         TaskColumns.TYPE,
-        TaskColumns.MODIFIED,
+        TaskColumns.CREATED,
         TaskColumns.DAY,
     };
     
@@ -18,7 +18,7 @@ public class TaskStore {
         public static final int DONE = 1;
         public static final int TASK = 2;
         public static final int TYPE = 3;
-        public static final int MODIFIED = 4;
+        public static final int CREATED = 4;
         public static final int DAY = 5;
     }
     
@@ -28,7 +28,7 @@ public class TaskStore {
         public static final String TASK = "task";
         /** History task, today's task or tomorrow's task */
         public static final String TYPE = "type";
-        public static final String MODIFIED = "modified";
+        public static final String CREATED = "created";
         /** the day of the year on which task is created */
         // TODO: there is a bug, if we are at end of a year, day-of-year is not reliable any more
         public static final String DAY = "day";
