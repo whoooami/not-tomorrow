@@ -75,6 +75,15 @@ public class AsyncTasksLoader extends AsyncTask<Void, Void, Boolean> {
 		}
 	    }
 	    // phase B: iterate serverTasks and merge into database
+	    for (Task t : serverTasks) {
+		if (localContains(localTasks, t)) {
+		    continue;
+		}
+		if (TextUtils.isEmpty(t.getTitle())) {
+		    continue;
+		}
+		addToLocal(t);
+	    }
 	    return true;
 	} catch (final GooglePlayServicesAvailabilityIOException availabilityException) {
 	    final Dialog dialog = GooglePlayServicesUtil.getErrorDialog(availabilityException.getConnectionStatusCode(),
@@ -84,6 +93,20 @@ public class AsyncTasksLoader extends AsyncTask<Void, Void, Boolean> {
 	    mActivity.startActivityForResult(userRecoverableException.getIntent(), TodayActivity.REQUEST_CODE_AUTHORIZATION);
 	} catch (IOException e) {
 	    Log.e(TAG, "exception caught, ", e);
+	}
+	return false;
+    }
+
+    private void addToLocal(Task t) {
+	final ContentValues cv = TaskWrapper.extraValues(t);
+	mActivity.getContentResolver().insert(TaskStore.CONTENT_URI, cv);
+    }
+
+    private boolean localContains(List<TaskWrapper> localTasks, Task t) {
+	for (TaskWrapper lt : localTasks) {
+	    if (t.getId().equals(lt.getId())) {
+		return true;
+	    }
 	}
 	return false;
     }
