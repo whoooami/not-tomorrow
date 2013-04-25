@@ -19,11 +19,9 @@ import android.widget.Toast;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GooglePlayServicesAvailabilityIOException;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
-import com.google.api.client.util.DateTime;
 import com.google.api.services.tasks.Tasks;
 import com.google.api.services.tasks.Tasks.TasksOperations;
 import com.google.api.services.tasks.model.Task;
-import com.hilton.todo.TaskStore.ProjectionIndex;
 import com.hilton.todo.TaskStore.TaskColumns;
 
 public class AsyncTasksLoader extends AsyncTask<Void, Void, Boolean> {
@@ -41,9 +39,9 @@ public class AsyncTasksLoader extends AsyncTask<Void, Void, Boolean> {
     protected Boolean doInBackground(Void... params) {
 	try {
 	    // step 1: read data of local
-	    final List<Task> localTasks = getLocalTasks();
-	    for (Task t : localTasks) {
-		Log.e(TAG, "look at local tasks: " + t.getTitle());
+	    final List<TaskWrapper> localTasks = getLocalTasks();
+	    for (TaskWrapper t : localTasks) {
+		Log.e(TAG, "look at local tasks: " + t);
 	    }
 	    TasksOperations.List operatorList = mTaskService.tasks().list("@default");
 	    final List<Task> tasks = operatorList.execute().getItems();
@@ -84,11 +82,11 @@ public class AsyncTasksLoader extends AsyncTask<Void, Void, Boolean> {
 	return false;
     }
 
-    private List<Task> getLocalTasks() {
+    private List<TaskWrapper> getLocalTasks() {
 	final Cursor c = mActivity.getContentResolver().query(TaskStore.CONTENT_URI, 
 	    TaskStore.PROJECTION, TaskColumns.TYPE + "=?", 
 	    new String[]{String.valueOf(TaskStore.TYPE_TODAY)}, null);
-	List<Task> tasks = new ArrayList<Task>();
+	List<TaskWrapper> tasks = new ArrayList<TaskWrapper>();
 	if (c == null) {
 	    return tasks;
 	}
@@ -97,12 +95,7 @@ public class AsyncTasksLoader extends AsyncTask<Void, Void, Boolean> {
 	    return tasks;
 	}
 	do {
-	    Task t = new Task();
-	    t.setTitle(c.getString(ProjectionIndex.TASK));
-	    boolean done = c.getInt(ProjectionIndex.DONE) == 1;
-	    DateTime d = new DateTime(c.getLong(ProjectionIndex.CREATED));
-	    t.setCompleted(done ? d : null);
-	    t.setUpdated(d);
+	    TaskWrapper t = new TaskWrapper(c);
 	    tasks.add(t);
 	} while (c.moveToNext());
 	c.close();
