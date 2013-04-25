@@ -11,6 +11,7 @@ public class TaskStore {
         TaskColumns.TYPE,
         TaskColumns.CREATED,
         TaskColumns.DAY,
+        TaskColumns.DELETED,
     };
     
     public static final class ProjectionIndex {
@@ -20,6 +21,7 @@ public class TaskStore {
         public static final int TYPE = 3;
         public static final int CREATED = 4;
         public static final int DAY = 5;
+        public static final int DELETED = 6;
     }
     
     public static class TaskColumns {
@@ -34,6 +36,7 @@ public class TaskStore {
         public static final String DAY = "day";
         public static final String MODIFIED = "modified";
         public static final String GOOGLE_TASK_ID = "google_task_id";
+        public static final String DELETED = "deleted";
     }
     
     public static final int TYPE_TODAY = 1;

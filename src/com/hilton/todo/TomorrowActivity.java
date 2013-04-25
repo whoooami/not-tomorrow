@@ -88,7 +88,8 @@ public class TomorrowActivity extends Activity {
         	return false;
             }
         });
-        final Cursor cursor = getContentResolver().query(TaskStore.CONTENT_URI, TaskStore.PROJECTION, TaskColumns.TYPE + " = " + TaskStore.TYPE_TOMORROW, null, null);
+        final Cursor cursor = getContentResolver().query(TaskStore.CONTENT_URI, TaskStore.PROJECTION, 
+        	TaskColumns.TYPE + " = " + TaskStore.TYPE_TOMORROW + " AND " + TaskColumns.DELETED + " = 0", null, null);
         final TaskAdapter adapter = new TaskAdapter(getApplication(), cursor);
         mTaskList.setAdapter(adapter);
         mGestureDetector = new GestureDetector(new SwitchGestureListener());
@@ -112,9 +113,13 @@ public class TomorrowActivity extends Activity {
 	AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
 	final Uri uri = ContentUris.withAppendedId(TaskStore.CONTENT_URI, info.id);
 	switch (item.getItemId()) {
-	case R.id.tomorrow_list_contextmenu_delete:
-	    getContentResolver().delete(uri, null, null);
+	case R.id.tomorrow_list_contextmenu_delete: {
+	    final ContentValues cv = new ContentValues(2);
+	    cv.put(TaskColumns.DELETED, 1);
+	    cv.put(TaskColumns.MODIFIED, new GregorianCalendar().getTimeInMillis());
+	    getContentResolver().update(uri, cv, null, null);
 	    return true;
+	}
 	case R.id.tomorrow_list_contextmenu_edit: {
 	    final View textEntryView = mFactory.inflate(R.layout.dialog_edit_task, null);
 	    final String content = getTaskContent(uri);

@@ -27,6 +27,9 @@ public class Utility {
 	context.getContentResolver().delete(TaskStore.CONTENT_URI, 
 		TaskColumns.TYPE + " = " + TaskStore.TYPE_HISTORY + " AND " + TaskColumns.DAY + " < " + firstDay, 
 		null);
+	
+	context.getContentResolver().delete(TaskStore.CONTENT_URI, 
+		TaskColumns.TYPE + "=" + TaskStore.TYPE_HISTORY + " AND " + TaskColumns.DELETED + "=1", null);
     }
 
     public static void recycleTasks(Context context) {

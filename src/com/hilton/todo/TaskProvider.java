@@ -163,6 +163,7 @@ public class TaskProvider extends ContentProvider {
                     TaskColumns.CREATED + " DATE, " +
                     TaskColumns.DAY + " INTEGER, " +
                     TaskColumns.MODIFIED + " DATE, " +
+                    TaskColumns.DELETED + " SHORT DEFAULT 0, " +
                     TaskColumns.GOOGLE_TASK_ID + " TEXT);");
         }
 
