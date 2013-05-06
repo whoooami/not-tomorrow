@@ -26,4 +26,5 @@
     <string name="edit">編輯</string>
     <string name="push">推遲到明天</string>
     <string name="reorder">重新調整順序</string>
+    <string name="description_missing">請輸入任務描述.</string>
 </resources>

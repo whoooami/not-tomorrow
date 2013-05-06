@@ -29,4 +29,5 @@
     <string name="edit">Edit</string>
     <string name="push">Push to Tomorrow</string>
     <string name="reorder">Reorder</string>
+    <string name="description_missing">Please enter task description.</string>
 </resources>
