@@ -6,12 +6,15 @@ import java.util.GregorianCalendar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 
@@ -58,5 +61,17 @@ public class Utility {
 	.setNegativeButton("Cancel", null)
 	.create();
 	return dialog;
+    }
+
+    public static String getTaskContent(final ContentResolver cr, final Uri uri) {
+	final Cursor c = cr.query(uri, new String[]{TaskColumns.TASK}, null, null, null);
+	if (c == null || !c.moveToFirst() || c.getCount() != 1) {
+	    if (c == null) {
+		return "";
+	    }
+	    c.close();
+	    return "";
+	}
+	return c.getString(0);
     }
 }
