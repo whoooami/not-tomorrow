@@ -71,7 +71,9 @@ public class AsyncTasksLoader extends AsyncTask<Void, Void, Boolean> {
 			    Log.e(TAG, "local task " + t + "\n server task " + st + "\n executed returns " + ut);
 			}
 		    } else {
-			t.updateTask(st, mActivity.getContentResolver());
+			if (!isWhiteSpaces(st.getTitle())) {
+			    t.updateTask(st, mActivity.getContentResolver());
+			}
 		    }
 		}
 	    }
@@ -97,6 +99,10 @@ public class AsyncTasksLoader extends AsyncTask<Void, Void, Boolean> {
 	    Log.e(TAG, "exception caught, ", e);
 	}
 	return false;
+    }
+
+    private boolean isWhiteSpaces(String title) {
+	return TextUtils.isEmpty(title) || title.equals("\n");
     }
 
     private void addToLocal(Task t) {
