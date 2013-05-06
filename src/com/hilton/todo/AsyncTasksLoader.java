@@ -2,8 +2,6 @@ package com.hilton.todo;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import android.app.Activity;
@@ -68,6 +66,7 @@ public class AsyncTasksLoader extends AsyncTask<Void, Void, Boolean> {
 			    t.mergeInto(st);
 			    final Task ut = mTaskService.tasks().update("@default", st.getId(), st).execute();
 			    // TOCHEKCK: ut should be the same to t.getTask and different from st
+			    Log.e(TAG, "local task " + t + "\n server task " + st + "\n executed returns " + ut);
 			}
 		    } else {
 			t.updateTask(st, mActivity.getContentResolver());
