@@ -123,7 +123,7 @@ public class TomorrowActivity extends Activity {
 	}
 	case R.id.tomorrow_list_contextmenu_edit: {
 	    final View textEntryView = mFactory.inflate(R.layout.dialog_edit_task, null);
-	    final String content = getTaskContent(uri);
+	    final String content = Utility.getTaskContent(getContentResolver(), uri);
 	    mDialogEditTask = new AlertDialog.Builder(TomorrowActivity.this)
 	    .setIcon(android.R.drawable.ic_dialog_alert)
 	    .setTitle(R.string.dialog_edit_title)
@@ -177,22 +177,9 @@ public class TomorrowActivity extends Activity {
 	}
 	getMenuInflater().inflate(R.menu.tomorrow_contextmenu, menu);
 	final Uri uri = ContentUris.withAppendedId(TaskStore.CONTENT_URI, id);
-	final String task = getTaskContent(uri);
+	final String task = Utility.getTaskContent(getContentResolver(), uri);
         menu.setHeaderTitle(task);
 	super.onCreateContextMenu(menu, v, menuInfo);
-    }
-
-    private String getTaskContent(final Uri uri) {
-	final Cursor c = getContentResolver().query(uri, new String[]{TaskColumns.TASK}, null, null, null);
-	if (c == null || !c.moveToFirst() || c.getCount() != 1) {
-	    Log.e(TAG, "shit, something is wrong, duplicated uri");
-	    if (c == null) {
-		return "";
-	    }
-	    c.close();
-	    return "";
-	}
-	return c.getString(0);
     }
 
     @Override

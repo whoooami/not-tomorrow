@@ -152,19 +152,14 @@ public class TodayActivity extends Activity {
 		     */
 		    // swap modified time of mDragPosition and mDragSrcPosition
 		    final Cursor src = (Cursor) mTaskList.getItemAtPosition(from);
-		    Log.e(TAG, "----------------src cursor and current row of source cursor");
 		    android.database.DatabaseUtils.dumpCurrentRow(src);
 		    long srcModified = src.getLong(ProjectionIndex.CREATED);
 		    final Uri srcUri = ContentUris.withAppendedId(TaskStore.CONTENT_URI, src.getLong(ProjectionIndex.ID));
-		    Log.e(TAG, "src uri " + srcUri);
 
-		    Log.e(TAG, "----------------dst cursor and current row of dst currsor");
 		    final Cursor dst = (Cursor) mTaskList.getItemAtPosition(to);
 		    android.database.DatabaseUtils.dumpCurrentRow(dst);
 		    long dstModified = dst.getLong(ProjectionIndex.CREATED);
 		    final Uri dstUri = ContentUris.withAppendedId(TaskStore.CONTENT_URI, dst.getLong(ProjectionIndex.ID));
-		    Log.e(TAG, "\t\t, dst uri " + dstUri);
-		    Log.e(TAG, "srcm " + srcModified + ", dstM " + dstModified);
 		    
 		    final ContentValues values = new ContentValues(1);
 		    values.put(TaskColumns.CREATED, dstModified);
@@ -172,7 +167,6 @@ public class TodayActivity extends Activity {
 		    values.clear();
 		    values.put(TaskColumns.CREATED, srcModified);
 		    getContentResolver().update(dstUri, values, null, null);
-		    Log.e(TAG, "data swapped, are you aware of that");
 	    }
         });
         mConnectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -199,7 +193,7 @@ public class TodayActivity extends Activity {
 	}
 	case R.id.today_list_contextmenu_edit: {
 	    final View textEntryView = mFactory.inflate(R.layout.dialog_edit_task, null);
-	    final String content = getTaskContent(uri);
+	    final String content = Utility.getTaskContent(getContentResolver(), uri);
 	    mDialogEditTask = new AlertDialog.Builder(TodayActivity.this)
 	    .setIcon(android.R.drawable.ic_dialog_alert)
 	    .setTitle(R.string.dialog_edit_title)
@@ -246,7 +240,7 @@ public class TodayActivity extends Activity {
     	    values.put(TaskColumns.CREATED, today.getTimeInMillis());
     	    values.put(TaskColumns.DAY, today.get(Calendar.DAY_OF_YEAR));
     	    getContentResolver().update(uri, values, null, null);
-    	    Toast.makeText(getApplication(), getString(R.string.move_to_tomorrow_tip).replace("#", getTaskContent(uri)), 
+    	    Toast.makeText(getApplication(), getString(R.string.move_to_tomorrow_tip).replace("#", Utility.getTaskContent(getContentResolver(), uri)), 
     		    Toast.LENGTH_SHORT).show();
     	    return true;
 	}
@@ -268,23 +262,11 @@ public class TodayActivity extends Activity {
 	}
 	getMenuInflater().inflate(R.menu.today_contextmenu, menu);
 	final Uri uri = ContentUris.withAppendedId(TaskStore.CONTENT_URI, id);
-	final String task = getTaskContent(uri);
+	final String task = Utility.getTaskContent(getContentResolver(), uri);
         menu.setHeaderTitle(task);
 	super.onCreateContextMenu(menu, v, menuInfo);
     }
 
-    private String getTaskContent(final Uri uri) {
-	final Cursor c = getContentResolver().query(uri, new String[]{TaskColumns.TASK}, null, null, null);
-	if (c == null || !c.moveToFirst() || c.getCount() != 1) {
-	    Log.e(TAG, "shit, something is wrong, duplicated uri");
-	    if (c == null) {
-		return "";
-	    }
-	    c.close();
-	    return "";
-	}
-	return c.getString(0);
-    }
     
     @Override
     public void onResume() {
@@ -342,10 +324,8 @@ public class TodayActivity extends Activity {
 	    break;
 	case REORDER:
 	    mTaskList.enterDragingMode();
-	    Log.e(TAG, "reorder things, are you aware of that");
 	    break;
 	case SYNC_GOOGLE_TASK: {
-	    // first check the network
 	    NetworkInfo info = mConnectivityManager.getActiveNetworkInfo();
 	    if (info == null || !info.isConnected()) {
 		if (mNoNetworkNotify == null) {
@@ -354,7 +334,6 @@ public class TodayActivity extends Activity {
 		mNoNetworkNotify.show();
 	    } else {
 		if (checkGooglePlayServicesAvailability()) {
-		    // do authorization
 		    prepareAuthentication();
 		    trySynchronize();
 		}
@@ -369,7 +348,6 @@ public class TodayActivity extends Activity {
 
     private void trySynchronize() {
 	if (mCredential.getSelectedAccountName() == null) {
-	    // need to authorize
 	    startActivityForResult(mCredential.newChooseAccountIntent(), REQUEST_CODE_ACCOUNT_PICKER);
 	} else {
 	    doSynchronization();
@@ -394,7 +372,6 @@ public class TodayActivity extends Activity {
 	switch (requestCode) {
 	case REQUEST_CODE_GOOGLE_PLAY_SERVICES:
 	    if (resultCode == Activity.RESULT_OK) {
-//		do authorization
 		prepareAuthentication();
 		trySynchronize();
 	    } else {
@@ -425,7 +402,6 @@ public class TodayActivity extends Activity {
     }
 
     private void doSynchronization() {
-	Log.e(TAG, "lalallala, let do synchronization");
 	new AsyncTasksLoader(this, mTaskService).execute();
     }
 
