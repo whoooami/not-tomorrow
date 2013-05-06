@@ -1,5 +1,7 @@
 package com.hilton.todo;
 
+import android.content.ContentResolver;
+import android.database.Cursor;
 import android.net.Uri;
 
 public class TaskStore {
@@ -46,4 +48,18 @@ public class TaskStore {
     public static final int TYPE_TODAY = 1;
     public static final int TYPE_TOMORROW = 2;
     public static final int TYPE_HISTORY = 3;
+    
+
+    public static Cursor getTomorrowTasks(ContentResolver cr) {
+	final Cursor cursor = cr.query(TaskStore.CONTENT_URI, TaskStore.PROJECTION, 
+        	TaskColumns.TYPE + " = " + TaskStore.TYPE_TOMORROW + " AND " + TaskColumns.DELETED + " = 0", null, null);
+	return cursor;
+    }
+    
+
+    public static Cursor getTodayTasks(ContentResolver cr) {
+	final Cursor cursor = cr.query(TaskStore.CONTENT_URI, TaskStore.PROJECTION, 
+        	TaskColumns.TYPE + " = " + TaskStore.TYPE_TODAY + " AND " + TaskColumns.DELETED + " = 0", null, null);
+	return cursor;
+    }
 }
