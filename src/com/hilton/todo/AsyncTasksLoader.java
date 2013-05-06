@@ -24,9 +24,9 @@ import com.hilton.todo.TaskStore.TaskColumns;
 
 public class AsyncTasksLoader extends AsyncTask<Void, Void, Boolean> {
     private static final String TAG = "AsyncTasksLoader";
-    private Activity mActivity;
+    private final Activity mActivity;
     private Dialog mProgress;
-    private Tasks mTaskService;
+    private final Tasks mTaskService;
     
     public AsyncTasksLoader(Activity a, Tasks service) {
 	mActivity = a;
@@ -51,7 +51,6 @@ public class AsyncTasksLoader extends AsyncTask<Void, Void, Boolean> {
 		    Log.e(TAG, "orginal local task is " + t);
 		    // push to server
 		    final Task newTask = mTaskService.tasks().insert("@default", t.getTask()).execute();
-		    printTask(newTask);
 		    t.updateTask(newTask, mActivity.getContentResolver());
 		} else {
 		    final Task st = findTaskWithId(serverTasks, t.getId());
@@ -64,10 +63,8 @@ public class AsyncTasksLoader extends AsyncTask<Void, Void, Boolean> {
 			if (t.isDeleted()) {
 			    mTaskService.tasks().delete("@default", st.getId()).execute();
 			} else {
-			    // TODO: update cannot work, bad request
 			    t.mergeInto(st);
 			    final Task ut = mTaskService.tasks().update("@default", st.getId(), st).execute();
-			    // TOCHEKCK: ut should be the same to t.getTask and different from st
 			    Log.e(TAG, "local task " + t + "\n server task " + st + "\n executed returns " + ut);
 			}
 		    } else {
@@ -128,25 +125,10 @@ public class AsyncTasksLoader extends AsyncTask<Void, Void, Boolean> {
 	return null;
     }
 
-    private void printTask(Task t) {
-	final StringBuilder sb = new StringBuilder();
-	sb.append("Task {\n");
-	sb.append("title : " + t.getTitle());
-	sb.append("\n id: " + t.getId());
-	sb.append("\n updated: " + t.getUpdated());
-	sb.append("\n completed: " + t.getCompleted());
-	sb.append("\n deleted: " + t.getDeleted());
-	sb.append("\n due: " + t.getDue());
-	sb.append("\n status: " + t.getStatus());
-	sb.append("}\n");
-	Log.e(TAG, "\t\tgot task: '" + sb.toString());
-	Log.e(TAG, "original task " + t);
-    }
-
     private List<TaskWrapper> getLocalTasks() {
 	final Cursor c = mActivity.getContentResolver().query(TaskStore.CONTENT_URI, 
-	    TaskStore.PROJECTION, TaskColumns.TYPE + "=?", 
-	    new String[]{String.valueOf(TaskStore.TYPE_TODAY)}, null);
+    	    	TaskStore.PROJECTION, TaskColumns.TYPE + "=?", 
+    	    	new String[]{String.valueOf(TaskStore.TYPE_TODAY)}, null);
 	List<TaskWrapper> tasks = new ArrayList<TaskWrapper>();
 	if (c == null) {
 	    return tasks;
