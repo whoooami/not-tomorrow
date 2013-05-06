@@ -14,5 +14,6 @@
 	    android:drawableRight="@color/white"
 	    android:drawableTop="@color/white"
 	    android:gravity="center_vertical"
+	    android:hint="@string/description_missing"
 	    android:inputType="textAutoCorrect" />
 </LinearLayout>
