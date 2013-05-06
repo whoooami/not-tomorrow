@@ -121,8 +121,7 @@ public class TodayActivity extends Activity {
         	return false;
             }
         });
-        final Cursor cursor = getContentResolver().query(TaskStore.CONTENT_URI, TaskStore.PROJECTION, 
-        	TaskColumns.TYPE + " = " + TaskStore.TYPE_TODAY + " AND " + TaskColumns.DELETED + " = 0", null, null);
+        final Cursor cursor = TaskStore.getTodayTasks(getContentResolver());
         final TaskAdapter adapter = new TaskAdapter(getApplication(), cursor);
         mTaskList.setAdapter(adapter);
         mSwitchGestureListener = new SwitchGestureListener();

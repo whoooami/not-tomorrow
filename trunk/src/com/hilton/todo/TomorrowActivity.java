@@ -90,8 +90,7 @@ public class TomorrowActivity extends Activity {
         	return false;
             }
         });
-        final Cursor cursor = getContentResolver().query(TaskStore.CONTENT_URI, TaskStore.PROJECTION, 
-        	TaskColumns.TYPE + " = " + TaskStore.TYPE_TOMORROW + " AND " + TaskColumns.DELETED + " = 0", null, null);
+        final Cursor cursor = TaskStore.getTomorrowTasks(getContentResolver());
         final TaskAdapter adapter = new TaskAdapter(getApplication(), cursor);
         mTaskList.setAdapter(adapter);
         mGestureDetector = new GestureDetector(new SwitchGestureListener());
