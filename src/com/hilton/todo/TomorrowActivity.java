@@ -13,7 +13,9 @@ import android.content.DialogInterface;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -145,6 +147,20 @@ public class TomorrowActivity extends Activity {
 	    mDialogEditTask.show();
 	    EditText box = (EditText) mDialogEditTask.findViewById(R.id.edit_box);
 	    box.setText(content);
+	    box.addTextChangedListener(new TextWatcher() {
+		@Override
+		public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+		}
+
+		@Override
+		public void onTextChanged(CharSequence s, int start, int before, int count) {
+		    mDialogEditTask.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(s.length() > 0);
+		}
+
+		@Override
+		public void afterTextChanged(Editable s) {
+		}
+	    });
 	    return true;
 	}
 	default:
