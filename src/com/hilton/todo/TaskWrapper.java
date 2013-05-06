@@ -24,6 +24,7 @@ public class TaskWrapper {
 	mTask = new Task();
 	mTask.setTitle(c.getString(ProjectionIndex.TASK));
 	final boolean done = c.getInt(ProjectionIndex.DONE) == 1;
+	mTask.setStatus(done ? "completed" : "needsAction");
 	DateTime d = new DateTime(c.getLong(ProjectionIndex.MODIFIED));
 	mTask.setCompleted(done ? d : null);
 	mTask.setUpdated(d);
@@ -55,7 +56,7 @@ public class TaskWrapper {
 	cv.put(TaskColumns.TASK, t.getTitle());
 	cv.put(TaskColumns.GOOGLE_TASK_ID, t.getId());
 	cv.put(TaskColumns.MODIFIED, t.getUpdated().getValue());
-	cv.put(TaskColumns.DONE, t.getCompleted() != null);
+	cv.put(TaskColumns.DONE, isCompleted(t) ? 1 : 0);
 	cv.put(TaskColumns.DELETED, t.getDeleted() != null && t.getDeleted() ? 1 : 0);
 	int type = TaskStore.TYPE_TODAY;
 	if (t.getDue() != null) {
@@ -68,8 +69,13 @@ public class TaskWrapper {
 	return cv;
     }
     
+    private static boolean isCompleted(Task t) {
+	return t.getStatus().equalsIgnoreCase("completed");
+    }
+
     public void mergeInto(Task t) {
 	t.setTitle(mTask.getTitle());
+	t.setStatus(mTask.getStatus());
 	t.setCompleted(mTask.getCompleted());
 	t.setDeleted(mTask.getDeleted());
 	t.setDue(mTask.getDue());
