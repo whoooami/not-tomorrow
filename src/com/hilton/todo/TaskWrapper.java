@@ -16,6 +16,8 @@ import com.hilton.todo.TaskStore.ProjectionIndex;
 import com.hilton.todo.TaskStore.TaskColumns;
 
 public class TaskWrapper {
+    private static final String STATUS_NEEDS_ACTION = "needsAction";
+    private static final String STATUS_COMPLETED = "completed";
     private final Uri mUri;
     private final Task mTask;
     
@@ -24,7 +26,7 @@ public class TaskWrapper {
 	mTask = new Task();
 	mTask.setTitle(c.getString(ProjectionIndex.TASK));
 	final boolean done = c.getInt(ProjectionIndex.DONE) == 1;
-	mTask.setStatus(done ? "completed" : "needsAction");
+	mTask.setStatus(done ? STATUS_COMPLETED : STATUS_NEEDS_ACTION);
 	DateTime d = new DateTime(c.getLong(ProjectionIndex.MODIFIED));
 	mTask.setCompleted(done ? d : null);
 	mTask.setUpdated(d);
@@ -70,7 +72,7 @@ public class TaskWrapper {
     }
     
     private static boolean isCompleted(Task t) {
-	return t.getStatus().equalsIgnoreCase("completed");
+	return t.getStatus().equalsIgnoreCase(STATUS_COMPLETED);
     }
 
     public void mergeInto(Task t) {
