@@ -6,12 +6,10 @@ import java.util.GregorianCalendar;
 
 import android.accounts.AccountManager;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -20,11 +18,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
 import android.util.Log;
@@ -80,7 +76,6 @@ public class TodayActivity extends Activity {
     private LayoutInflater mFactory;
     private GestureDetector mGestureDetector;
     private SwitchGestureListener mSwitchGestureListener;
-    private AlertDialog mDialogEditTask;
     private ConnectivityManager mConnectivityManager;
     private Dialog mNoNetworkNotify;
     final HttpTransport transport = AndroidHttp.newCompatibleTransport();
@@ -192,44 +187,7 @@ public class TodayActivity extends Activity {
 	    return true;
 	}
 	case R.id.today_list_contextmenu_edit: {
-	    final View textEntryView = mFactory.inflate(R.layout.dialog_edit_task, null);
-	    final String content = Utility.getTaskContent(getContentResolver(), uri);
-	    mDialogEditTask = new AlertDialog.Builder(TodayActivity.this)
-	    .setIcon(android.R.drawable.ic_dialog_alert)
-	    .setTitle(R.string.dialog_edit_title)
-	    .setView(textEntryView)
-	    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-		public void onClick(DialogInterface dialog, int whichButton) {
-		    final EditText box = (EditText) mDialogEditTask.findViewById(R.id.edit_box);
-		    final String newContent = box.getText().toString();
-		    if (content.equals(newContent)) {
-			return;
-		    }
-		    final ContentValues cv = new ContentValues();
-		    cv.put(TaskColumns.TASK, box.getText().toString());
-		    cv.put(TaskColumns.MODIFIED, new GregorianCalendar().getTimeInMillis());
-		    getContentResolver().update(uri, cv, null, null);
-		}
-	    })
-	    .setNegativeButton(android.R.string.cancel, null)
-	    .create();
-	    mDialogEditTask.show();
-	    EditText box = (EditText) mDialogEditTask.findViewById(R.id.edit_box);
-	    box.setText(content);
-	    box.addTextChangedListener(new TextWatcher() {
-		@Override
-		public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-		}
-
-		@Override
-		public void onTextChanged(CharSequence s, int start, int before, int count) {
-		    mDialogEditTask.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(s.length() > 0);
-		}
-
-		@Override
-		public void afterTextChanged(Editable s) {
-		}
-	    });
+	    Utility.showEditDialog(uri, TodayActivity.this);
 	    return true;
 	}
 	case R.id.today_list_contextmenu_push: {

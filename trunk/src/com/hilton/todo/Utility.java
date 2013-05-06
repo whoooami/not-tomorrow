@@ -17,6 +17,11 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.EditText;
 
 import com.hilton.todo.TaskStore.TaskColumns;
 
@@ -73,5 +78,55 @@ public class Utility {
 	    return "";
 	}
 	return c.getString(0);
+    }
+    
+
+    public static void showEditDialog(final Uri uri, final Activity a) {
+	final View textEntryView = LayoutInflater.from(a).inflate(R.layout.dialog_edit_task, null);
+	final String content = Utility.getTaskContent(a.getContentResolver(), uri);
+	final AlertDialog dialogEditTask = new AlertDialog.Builder(a)
+	.setIcon(android.R.drawable.ic_dialog_alert)
+	.setTitle(R.string.dialog_edit_title)
+	.setView(textEntryView)
+	.create();
+	
+	dialogEditTask.setButton(AlertDialog.BUTTON_POSITIVE, a.getString(android.R.string.ok), new DialogInterface.OnClickListener() {
+	    public void onClick(DialogInterface dialog, int whichButton) {
+		final EditText box = (EditText) dialogEditTask.findViewById(R.id.edit_box);
+		final String newContent = box.getText().toString();
+		if (content.equals(newContent)) {
+		    return;
+		}
+		final ContentValues cv = new ContentValues();
+		cv.put(TaskColumns.TASK, box.getText().toString());
+		cv.put(TaskColumns.MODIFIED, new GregorianCalendar().getTimeInMillis());
+		a.getContentResolver().update(uri, cv, null, null);
+	    }
+	});
+	dialogEditTask.setButton(AlertDialog.BUTTON_NEGATIVE, a.getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+	    @Override
+	    public void onClick(DialogInterface dialog, int which) {
+	    }
+	});
+	
+	dialogEditTask.show();
+	
+	final EditText box = (EditText) dialogEditTask.findViewById(R.id.edit_box);
+	box.setText(content);
+	box.addTextChangedListener(new TextWatcher() {
+	    @Override
+	    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+	    }
+	    
+	    @Override
+	    public void onTextChanged(CharSequence s, int start, int before, int count) {
+		dialogEditTask.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(s.length() > 0);
+	    }
+	    
+	    @Override
+	    public void afterTextChanged(Editable s) {
+	    }
+	});
+	
     }
 }

@@ -9,13 +9,10 @@ import android.app.AlertDialog;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.Editable;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -122,44 +119,7 @@ public class TomorrowActivity extends Activity {
 	    return true;
 	}
 	case R.id.tomorrow_list_contextmenu_edit: {
-	    final View textEntryView = mFactory.inflate(R.layout.dialog_edit_task, null);
-	    final String content = Utility.getTaskContent(getContentResolver(), uri);
-	    mDialogEditTask = new AlertDialog.Builder(TomorrowActivity.this)
-	    .setIcon(android.R.drawable.ic_dialog_alert)
-	    .setTitle(R.string.dialog_edit_title)
-	    .setView(textEntryView)
-	    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-		public void onClick(DialogInterface dialog, int whichButton) {
-		    final EditText box = (EditText) mDialogEditTask.findViewById(R.id.edit_box);
-		    final String newContent = box.getText().toString();
-		    if (content.equals(newContent)) {
-			return;
-		    }
-		    final ContentValues cv = new ContentValues();
-		    cv.put(TaskColumns.TASK, newContent);
-		    cv.put(TaskColumns.MODIFIED, new GregorianCalendar().getTimeInMillis());
-		    getContentResolver().update(uri, cv, null, null);
-		}
-	    })
-	    .setNegativeButton(android.R.string.cancel, null)
-	    .create();
-	    mDialogEditTask.show();
-	    EditText box = (EditText) mDialogEditTask.findViewById(R.id.edit_box);
-	    box.setText(content);
-	    box.addTextChangedListener(new TextWatcher() {
-		@Override
-		public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-		}
-
-		@Override
-		public void onTextChanged(CharSequence s, int start, int before, int count) {
-		    mDialogEditTask.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(s.length() > 0);
-		}
-
-		@Override
-		public void afterTextChanged(Editable s) {
-		}
-	    });
+	    Utility.showEditDialog(uri, TomorrowActivity.this);
 	    return true;
 	}
 	default:
@@ -204,7 +164,6 @@ public class TomorrowActivity extends Activity {
             }
 
             final String taskContent = cursor.getString(ProjectionIndex.TASK);
-            final short done = cursor.getShort(ProjectionIndex.DONE);
             final int id = cursor.getInt(ProjectionIndex.ID);
             final Uri uri = ContentUris.withAppendedId(TaskStore.CONTENT_URI, id);
             final ImageView move = (ImageView) view.findViewById(R.id.action_move_to_today);
