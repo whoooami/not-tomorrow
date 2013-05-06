@@ -47,11 +47,11 @@ public class TaskWrapper {
     }
     
     public void updateTask(Task t, ContentResolver cr) {
-	final ContentValues cv = extraValues(t);
+	final ContentValues cv = extractValues(t);
 	cr.update(mUri, cv, null, null);
     }
 
-    public static ContentValues extraValues(Task t) {
+    public static ContentValues extractValues(Task t) {
 	final ContentValues cv = new ContentValues();
 	cv.put(TaskColumns.TASK, t.getTitle());
 	cv.put(TaskColumns.GOOGLE_TASK_ID, t.getId());

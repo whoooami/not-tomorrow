@@ -98,7 +98,7 @@ public class AsyncTasksLoader extends AsyncTask<Void, Void, Boolean> {
     }
 
     private void addToLocal(Task t) {
-	final ContentValues cv = TaskWrapper.extraValues(t);
+	final ContentValues cv = TaskWrapper.extractValues(t);
 	mActivity.getContentResolver().insert(TaskStore.CONTENT_URI, cv);
     }
 
