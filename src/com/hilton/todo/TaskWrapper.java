@@ -108,4 +108,8 @@ public class TaskWrapper {
 		", \nid: " + mTask.getId() + ", \n " + mTask.getCompleted() +
 		", \nupdated " + mTask.getUpdated() + ", \ndeleted " + mTask.getDeleted() + "}}";
     }
+
+    public void deleteFromLocal(final ContentResolver contentResolver) {
+	contentResolver.delete(mUri, null, null);
+    }
 }

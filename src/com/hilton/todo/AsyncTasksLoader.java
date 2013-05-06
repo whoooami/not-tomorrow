@@ -56,6 +56,8 @@ public class AsyncTasksLoader extends AsyncTask<Void, Void, Boolean> {
 		} else {
 		    final Task st = findTaskWithId(serverTasks, t.getId());
 		    if (st == null) {
+			// no such a task in server, we believe that server has deleted it, so we delete it from local
+			t.deleteFromLocal(mActivity.getContentResolver());
 			continue;
 		    }
 		    if (t.isNewerThan(st)) {
@@ -75,6 +77,7 @@ public class AsyncTasksLoader extends AsyncTask<Void, Void, Boolean> {
 	    }
 	    // phase B: iterate serverTasks and merge into database
 	    for (Task t : serverTasks) {
+		Log.e(TAG, "server tasks: " + t);
 		if (localContains(localTasks, t)) {
 		    continue;
 		}
