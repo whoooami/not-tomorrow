@@ -56,7 +56,18 @@ public class TaskStore {
     public static final int TYPE_TOMORROW = 2;
     public static final int TYPE_HISTORY = 3;
     
-
+    public static final String[] POMODORO_PROJECTION = new String[] {
+	TaskColumns.EXPECTED,
+	TaskColumns.SPENT,
+	TaskColumns.INTERRUPTS,
+    };
+    
+    public static final class PomodoroIndex {
+        public static final int EXPECTED = 0;
+        public static final int SPENT = 1;
+        public static final int INTERRUPTS = 2;
+    }
+    
     public static Cursor getTomorrowTasks(ContentResolver cr) {
 	final Cursor cursor = cr.query(TaskStore.CONTENT_URI, TaskStore.PROJECTION, 
         	TaskColumns.TYPE + " = " + TaskStore.TYPE_TOMORROW + " AND " + TaskColumns.DELETED + " = 0", null, null);
@@ -67,6 +78,13 @@ public class TaskStore {
     public static Cursor getTodayTasks(ContentResolver cr) {
 	final Cursor cursor = cr.query(TaskStore.CONTENT_URI, TaskStore.PROJECTION, 
         	TaskColumns.TYPE + " = " + TaskStore.TYPE_TODAY + " AND " + TaskColumns.DELETED + " = 0", null, null);
+	return cursor;
+    }
+
+
+    public static Cursor getTaskDetails(Uri uri, ContentResolver cr) {
+	final Cursor cursor = cr.query(uri, POMODORO_PROJECTION, null, null, null);
+	cursor.moveToFirst();
 	return cursor;
     }
 }
