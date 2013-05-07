@@ -43,6 +43,13 @@ public class TaskStore {
         public static final String MODIFIED = "modified";
         public static final String GOOGLE_TASK_ID = "google_task_id";
         public static final String DELETED = "deleted";
+        
+        /** Expected number of Pomodoros for this task */
+        public static final String EXPECTED = "expected";
+        /** Number of Pomodoro actually spent on this task */
+        public static final String SPENT = "spent";
+        /** Number of interrupts while executing this task */
+        public static final String INTERRUPTS = "interrupts";
     }
     
     public static final int TYPE_TODAY = 1;
