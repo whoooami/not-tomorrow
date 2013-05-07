@@ -30,7 +30,6 @@ public class TaskDetailsActivity extends Activity {
     private RatingBar mSpent_2;
     private int mSpentPomodoros;
     private Toast mTaskTooBigNoti;
-    private LinearLayout mContainer;
     private Cursor mCursor;
     private ContentObserver mContentObserver;
     
@@ -54,8 +53,6 @@ public class TaskDetailsActivity extends Activity {
 	
 	mSpentPomodoros = mCursor.getInt(PomodoroIndex.SPENT);
 	setSpentRating();
-	
-	mContainer = (LinearLayout) findViewById(R.id.container);
 	
 	initializeInterrupts();
 	
@@ -128,15 +125,6 @@ public class TaskDetailsActivity extends Activity {
     protected void onStop() {
 	mCursor.unregisterContentObserver(mContentObserver);
 	super.onStop();
-    }
-
-    private void addInterrupt(final int rating) {
-	RatingBar second = new RatingBar(this);
-	second.setNumStars(6);
-	second.setRating(rating);
-	second.setStepSize(1.0f);
-	second.setIsIndicator(true);
-	mContainer.addView(second);
     }
 
     private void setExpectedRating(int expected) {
