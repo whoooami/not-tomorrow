@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RatingBar;
 import android.widget.RatingBar.OnRatingBarChangeListener;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.hilton.todo.TaskStore.PomodoroIndex;
@@ -39,6 +40,7 @@ public class TaskDetailsActivity extends Activity {
 	setTitle(getIntent().getStringExtra(EXTRA_TASK_CONTENT));
 	
 	final boolean taskIsDone = getIntent().getBooleanExtra(EXTRA_TASK_STATUS, false);
+	
 	
 	instantiateExpected(uri, taskIsDone);
 	
@@ -87,6 +89,9 @@ public class TaskDetailsActivity extends Activity {
 	    }
 	});
 	startPomodoro.setEnabled(!taskIsDone);
+	
+	final TextView statusPanel = (TextView) findViewById(R.id.status_panel);
+	statusPanel.setText(taskIsDone ? "Task is completed and takes " + mSpentPomodoros*0.5f + " hours." : "Unfinished, needs action.");
     }
 
     private void initializeInterrupts() {
