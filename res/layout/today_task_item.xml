@@ -17,6 +17,12 @@
 
 	<TextView android:id="@+id/task"
            style="@style/task_item_text" />
+	<ImageView android:id="@+id/pomodoro_card"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:contentDescription="Goto Pomodoro card"
+	    android:visibility="visible"
+	    android:src="@drawable/ic_delete_normal"/>
 	
 	<ImageView android:id="@+id/dragger"
         android:layout_width="wrap_content"
