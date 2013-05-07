@@ -20,6 +20,7 @@ public class TaskDetailsActivity extends Activity {
 
     public static final String ACTION_VIEW_DETAILS = "com.hilton.todo.VIEW_TASK_DETAILS";
     public static final String EXTRA_TASK_CONTENT = "task_content";
+    public static final String EXTRA_TASK_STATUS = "task_status";
     
     private RatingBar mExpected_1;
     private RatingBar mExpected_2;
@@ -37,7 +38,9 @@ public class TaskDetailsActivity extends Activity {
 	final Uri uri = getIntent().getData();
 	setTitle(getIntent().getStringExtra(EXTRA_TASK_CONTENT));
 	
-	instantiateExpected(uri);
+	final boolean taskIsDone = getIntent().getBooleanExtra(EXTRA_TASK_STATUS, false);
+	
+	instantiateExpected(uri, taskIsDone);
 	
 	mSpent_1 = (RatingBar) findViewById(R.id.spent_1);
 	mSpent_2 = (RatingBar) findViewById(R.id.spent_2);
@@ -83,6 +86,7 @@ public class TaskDetailsActivity extends Activity {
 		getContentResolver().update(uri, values, null, null);
 	    }
 	});
+	startPomodoro.setEnabled(!taskIsDone);
     }
 
     private void initializeInterrupts() {
@@ -143,7 +147,7 @@ public class TaskDetailsActivity extends Activity {
 	}
     }
 
-    private void instantiateExpected(final Uri uri) {
+    private void instantiateExpected(final Uri uri, final boolean isIndicator) {
 	mExpected_1 = (RatingBar) findViewById(R.id.expected_1);
 	mExpected_1.setOnRatingBarChangeListener(new OnRatingBarChangeListener() {
 	    @Override
@@ -155,6 +159,7 @@ public class TaskDetailsActivity extends Activity {
 	    }
 
 	});
+	mExpected_1.setIsIndicator(isIndicator);
 	mExpected_2 = (RatingBar) findViewById(R.id.expected_2);
 	mExpected_2.setOnRatingBarChangeListener(new OnRatingBarChangeListener() {
 	    @Override
@@ -165,6 +170,7 @@ public class TaskDetailsActivity extends Activity {
 		updateExpected(uri, rating, mExpected_1);
 	    }
 	});
+	mExpected_2.setIsIndicator(isIndicator);
     }
     
     private void updateExpected(final Uri uri, float rating, RatingBar another) {
