@@ -13,6 +13,7 @@ public class TaskDetailsActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 	super.onCreate(savedInstanceState);
+	setContentView(R.layout.task_details);
 	final Uri uri = getIntent().getData();
 	Log.e(TAG, "uri " + uri);
     }
