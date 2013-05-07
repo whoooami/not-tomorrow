@@ -7,10 +7,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.RatingBar.OnRatingBarChangeListener;
 import android.widget.Toast;
@@ -23,7 +21,6 @@ public class TaskDetailsActivity extends Activity {
     public static final String ACTION_VIEW_DETAILS = "com.hilton.todo.VIEW_TASK_DETAILS";
     public static final String EXTRA_TASK_CONTENT = "task_content";
     
-    private static final String TAG = "TaskDetailsActivity";
     private RatingBar mExpected_1;
     private RatingBar mExpected_2;
     private RatingBar mSpent_1;
@@ -38,7 +35,6 @@ public class TaskDetailsActivity extends Activity {
 	super.onCreate(savedInstanceState);
 	setContentView(R.layout.task_details);
 	final Uri uri = getIntent().getData();
-	Log.e(TAG, "uri " + uri);
 	setTitle(getIntent().getStringExtra(EXTRA_TASK_CONTENT));
 	
 	instantiateExpected(uri);
