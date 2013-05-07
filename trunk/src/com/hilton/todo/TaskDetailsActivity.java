@@ -88,7 +88,10 @@ public class TaskDetailsActivity extends Activity {
 		values.put(TaskColumns.SPENT, mSpentPomodoros);
 		getContentResolver().update(uri, values, null, null);
 		
-		startActivity(new Intent(getApplication(), PomodoroClockActivity.class));
+		final Intent i = new Intent(getApplication(), PomodoroClockActivity.class);
+		i.putExtra(EXTRA_TASK_CONTENT, getIntent().getStringExtra(EXTRA_TASK_CONTENT));
+		i.setData(uri);
+		startActivity(i);
 	    }
 	});
 	startPomodoro.setEnabled(!taskIsDone);
