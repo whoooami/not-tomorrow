@@ -2,6 +2,7 @@ package com.hilton.todo;
 
 import android.app.Activity;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
@@ -86,6 +87,8 @@ public class TaskDetailsActivity extends Activity {
 		final ContentValues values = new ContentValues(1);
 		values.put(TaskColumns.SPENT, mSpentPomodoros);
 		getContentResolver().update(uri, values, null, null);
+		
+		startActivity(new Intent(getApplication(), PomodoroClockActivity.class));
 	    }
 	});
 	startPomodoro.setEnabled(!taskIsDone);
