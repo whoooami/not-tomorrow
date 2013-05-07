@@ -12,6 +12,7 @@ import com.hilton.todo.TaskStore.TaskColumns;
 
 public class PomodoroClockActivity extends Activity {
     private int mInterruptsCount;
+    private int mSpentPomodoros;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +33,19 @@ public class PomodoroClockActivity extends Activity {
 		final ContentValues values = new ContentValues(1);
 		values.put(TaskColumns.INTERRUPTS, mInterruptsCount);
 		getContentResolver().update(uri, values, null, null);
+	    }
+	});
+	
+	mSpentPomodoros = getIntent().getIntExtra(TaskDetailsActivity.EXTRA_SPENT_POMODOROS, 1);
+	final Button cancel = (Button) findViewById(R.id.cancel);
+	cancel.setOnClickListener(new View.OnClickListener() {
+	    @Override
+	    public void onClick(View v) {
+		mSpentPomodoros--;
+		final ContentValues values = new ContentValues(1);
+		values.put(TaskColumns.SPENT, mSpentPomodoros);
+		getContentResolver().update(uri, values, null, null);
+		finish();
 	    }
 	});
     }
