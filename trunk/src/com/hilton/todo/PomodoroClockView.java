@@ -19,7 +19,6 @@ public class PomodoroClockView extends View {
     private Paint mWorkingPaint;
     private Paint mCountDownPaint;
     private float mSweepAngle;
-    private float mRemainingTime;
     
     public PomodoroClockView(Context context) {
 	this(context, null);
@@ -47,7 +46,6 @@ public class PomodoroClockView extends View {
 	mCountDownPaint.setAlpha(200);
 	mCountDownPaint.setStyle(Style.FILL);
 	mSweepAngle = 0.0f;
-	mRemainingTime = 1800.0f; // in seconds; 30 mins = 30 * 60 = 1800 s
     }
 
     @Override
@@ -75,13 +73,11 @@ public class PomodoroClockView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-	canvas.drawColor(Color.GRAY);
 	canvas.drawArc(mWorkingArea, 210, 60, true, mRestPaint);
 	canvas.drawArc(mWorkingArea, 270, 300, true, mWorkingPaint);
 	canvas.drawArc(mWorkingArea, 270, mSweepAngle, true, mCountDownPaint);
 	super.onDraw(canvas);
-	mRemainingTime -= 5.0f;
 	mSweepAngle += 1.0f;
-	postInvalidateDelayed(500, (int) mWorkingArea.left, (int) mWorkingArea.top, (int) mWorkingArea.right, (int) mWorkingArea.bottom);
+	postInvalidateDelayed(5000, (int) mWorkingArea.left, (int) mWorkingArea.top, (int) mWorkingArea.right, (int) mWorkingArea.bottom);
     }
 }

@@ -70,7 +70,7 @@ public class PomodoroClockActivity extends Activity {
 	    }
 	});
 	
-	mRemainingTimeInSeconds = 180; // 30 mins
+	mRemainingTimeInSeconds = 1800; // 30 mins
 	updateClockStatus();
     }
 
