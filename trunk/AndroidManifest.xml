@@ -36,6 +36,13 @@
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
+        <activity android:name="com.hilton.todo.TaskDetailsActivity"
+                android:configChanges="orientation|keyboard|keyboardHidden"
+                android:label="Task details">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
         <provider android:name="TaskProvider"
             android:authorities="com.hilton.todo.TaskProvider" />
         <service android:name="TaskRecyclerService" android:exported="false" />
