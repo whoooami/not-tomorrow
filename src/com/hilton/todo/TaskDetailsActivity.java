@@ -50,13 +50,10 @@ public class TaskDetailsActivity extends Activity {
 	
 	mCursor = TaskStore.getTaskDetails(uri, getContentResolver());
 	mCursor.moveToFirst();
-	int expected = mCursor.getInt(PomodoroIndex.EXPECTED);
-	setExpectedRating(expected);
 	
 	mSpentPomodoros = mCursor.getInt(PomodoroIndex.SPENT);
-	setSpentRating();
 	
-	initializeInterrupts();
+	setInterrupts();
 	
 	final Button startPomodoro = (Button) findViewById(R.id.start_pomodoro);
 	startPomodoro.setOnClickListener(new View.OnClickListener() {
@@ -91,7 +88,7 @@ public class TaskDetailsActivity extends Activity {
 	statusPanel.setText(taskIsDone ? "Task is completed and takes " + mSpentPomodoros*0.5f + " hours." : "Unfinished, needs action.");
     }
 
-    private void initializeInterrupts() {
+    private void setInterrupts() {
 	mCursor.moveToFirst();
 	final RatingBar interrupts_1 = (RatingBar) findViewById(R.id.interrupts_1);
 	final RatingBar interrupts_2 = (RatingBar) findViewById(R.id.interrupts_2);
@@ -122,7 +119,11 @@ public class TaskDetailsActivity extends Activity {
     protected void onStart() {
 	mCursor.requery();
 	mCursor.moveToFirst();
-	initializeInterrupts();
+	
+	setExpectedRating(mCursor.getInt(PomodoroIndex.EXPECTED));
+	setSpentRating();
+	setInterrupts();
+	
 	super.onStart();
     }
 
