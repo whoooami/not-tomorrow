@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.hilton.todo.PomodoroClockView.OnTimeoutListener;
 import com.hilton.todo.TaskStore.TaskColumns;
 
 public class PomodoroClockActivity extends Activity {
@@ -45,6 +46,14 @@ public class PomodoroClockActivity extends Activity {
 		final ContentValues values = new ContentValues(1);
 		values.put(TaskColumns.SPENT, mSpentPomodoros);
 		getContentResolver().update(uri, values, null, null);
+		finish();
+	    }
+	});
+	
+	final PomodoroClockView clock = (PomodoroClockView) findViewById(R.id.clock_view);
+	clock.setOnTimeoutListener(new OnTimeoutListener() {
+	    @Override
+	    public void onTimeout() {
 		finish();
 	    }
 	});
