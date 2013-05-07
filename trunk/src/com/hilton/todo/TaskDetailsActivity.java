@@ -32,7 +32,6 @@ public class TaskDetailsActivity extends Activity {
     private int mSpentPomodoros;
     private Toast mTaskTooBigNoti;
     private Cursor mCursor;
-    private ContentObserver mContentObserver;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,16 +57,6 @@ public class TaskDetailsActivity extends Activity {
 	setSpentRating();
 	
 	initializeInterrupts();
-	
-	mContentObserver = new ContentObserver(new Handler()) {
-	    @Override
-	    public void onChange(boolean selfChange) {
-		mCursor.requery();
-		mCursor.moveToFirst();
-		initializeInterrupts();
-		super.onChange(selfChange);
-	    }
-	};
 	
 	final Button startPomodoro = (Button) findViewById(R.id.start_pomodoro);
 	startPomodoro.setOnClickListener(new View.OnClickListener() {
@@ -131,7 +120,6 @@ public class TaskDetailsActivity extends Activity {
 
     @Override
     protected void onStart() {
-	mCursor.registerContentObserver(mContentObserver);
 	mCursor.requery();
 	mCursor.moveToFirst();
 	initializeInterrupts();
@@ -140,7 +128,6 @@ public class TaskDetailsActivity extends Activity {
 
     @Override
     protected void onStop() {
-	mCursor.unregisterContentObserver(mContentObserver);
 	super.onStop();
     }
 
