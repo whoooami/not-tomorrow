@@ -3,11 +3,9 @@ package com.hilton.todo;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
-import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RatingBar;
@@ -24,6 +22,7 @@ public class TaskDetailsActivity extends Activity {
     public static final String EXTRA_TASK_CONTENT = "task_content";
     public static final String EXTRA_TASK_STATUS = "task_status";
     public static final String EXTRA_INTERRUPTS_COUNT = "interrupts_count";
+    public static final String EXTRA_SPENT_POMODOROS = "spent_pomodoros";
     
     private RatingBar mExpected_1;
     private RatingBar mExpected_2;
@@ -78,6 +77,7 @@ public class TaskDetailsActivity extends Activity {
 		final Intent i = new Intent(getApplication(), PomodoroClockActivity.class);
 		i.putExtra(EXTRA_TASK_CONTENT, getIntent().getStringExtra(EXTRA_TASK_CONTENT));
 		i.putExtra(EXTRA_INTERRUPTS_COUNT, mCursor.getInt(PomodoroIndex.INTERRUPTS));
+		i.putExtra(EXTRA_SPENT_POMODOROS, mSpentPomodoros);
 		i.setData(uri);
 		startActivity(i);
 	    }
@@ -119,7 +119,7 @@ public class TaskDetailsActivity extends Activity {
     protected void onStart() {
 	mCursor.requery();
 	mCursor.moveToFirst();
-	
+	mSpentPomodoros = mCursor.getInt(PomodoroIndex.SPENT);
 	setExpectedRating(mCursor.getInt(PomodoroIndex.EXPECTED));
 	setSpentRating();
 	setInterrupts();
