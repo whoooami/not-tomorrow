@@ -11,6 +11,11 @@
         android:text="Task description"
         android:textSize="18sp" />
     
+    <com.hilton.todo.PomodoroClockView
+        android:layout_height="360dip"
+        android:layout_width="300dip"
+        android:layout_gravity="center_horizontal" />
+    
     <TextView android:id="@+id/clock_status"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
