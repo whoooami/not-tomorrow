@@ -21,6 +21,8 @@ import com.hilton.todo.TaskStore.TaskColumns;
 public class TaskDetailsActivity extends Activity {
 
     public static final String ACTION_VIEW_DETAILS = "com.hilton.todo.VIEW_TASK_DETAILS";
+    public static final String EXTRA_TASK_CONTENT = "task_content";
+    
     private static final String TAG = "TaskDetailsActivity";
     private RatingBar mExpected_1;
     private RatingBar mExpected_2;
@@ -38,6 +40,7 @@ public class TaskDetailsActivity extends Activity {
 	setContentView(R.layout.task_details);
 	final Uri uri = getIntent().getData();
 	Log.e(TAG, "uri " + uri);
+	setTitle(getIntent().getStringExtra(EXTRA_TASK_CONTENT));
 	
 	instantiateExpected(uri);
 	

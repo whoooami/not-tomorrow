@@ -456,6 +456,7 @@ public class TodayActivity extends Activity {
 	        @Override
 	        public void onClick(View v) {
 	            Intent i = new Intent(getApplication(), TaskDetailsActivity.class);
+	            i.putExtra(TaskDetailsActivity.EXTRA_TASK_CONTENT, taskContent);
 	            i.setData(uri);
 	            startActivity(i);
 	        }
