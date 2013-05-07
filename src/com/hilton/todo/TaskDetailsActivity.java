@@ -49,7 +49,7 @@ public class TaskDetailsActivity extends Activity {
 	mSpent_1 = (RatingBar) findViewById(R.id.spent_1);
 	mSpent_2 = (RatingBar) findViewById(R.id.spent_2);
 	
-	mCursor = managedQuery(uri, TaskStore.POMODORO_PROJECTION, null, null, null);
+	mCursor = TaskStore.getTaskDetails(uri, getContentResolver());
 	mCursor.moveToFirst();
 	int expected = mCursor.getInt(PomodoroIndex.EXPECTED);
 	setExpectedRating(expected);
@@ -91,7 +91,6 @@ public class TaskDetailsActivity extends Activity {
 		
 		final Intent i = new Intent(getApplication(), PomodoroClockActivity.class);
 		i.putExtra(EXTRA_TASK_CONTENT, getIntent().getStringExtra(EXTRA_TASK_CONTENT));
-		mCursor.moveToFirst();
 		i.putExtra(EXTRA_INTERRUPTS_COUNT, mCursor.getInt(PomodoroIndex.INTERRUPTS));
 		i.setData(uri);
 		startActivity(i);
@@ -133,6 +132,8 @@ public class TaskDetailsActivity extends Activity {
     @Override
     protected void onStart() {
 	mCursor.registerContentObserver(mContentObserver);
+	mCursor.requery();
+	mCursor.moveToFirst();
 	initializeInterrupts();
 	super.onStart();
     }
@@ -141,6 +142,12 @@ public class TaskDetailsActivity extends Activity {
     protected void onStop() {
 	mCursor.unregisterContentObserver(mContentObserver);
 	super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+	mCursor.close();
+	super.onDestroy();
     }
 
     private void setExpectedRating(int expected) {
