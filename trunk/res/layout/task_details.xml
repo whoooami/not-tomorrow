@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
@@ -52,11 +53,27 @@
         android:singleLine="true"
         android:text="Interrupts:"/>
 
-    <RatingBar android:id="@+id/interrupts"
+    <RatingBar android:id="@+id/interrupts_1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:isIndicator="true"
         android:numStars="6"
         android:rating="0"
         android:stepSize="1.0" />
+    <RatingBar android:id="@+id/interrupts_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:isIndicator="true"
+        android:numStars="6"
+        android:rating="0"
+        android:stepSize="1.0"
+        android:visibility="gone" />
+    <RatingBar android:id="@+id/interrupts_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:isIndicator="true"
+        android:numStars="6"
+        android:rating="0"
+        android:stepSize="1.0"
+        android:visibility="gone" />
 </LinearLayout>
