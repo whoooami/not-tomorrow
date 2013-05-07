@@ -2,12 +2,15 @@ package com.hilton.todo;
 
 import android.app.Activity;
 import android.content.ContentValues;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.RatingBar.OnRatingBarChangeListener;
 import android.widget.Toast;
@@ -25,6 +28,9 @@ public class TaskDetailsActivity extends Activity {
     private RatingBar mSpent_2;
     private int mSpentPomodoros;
     private Toast mTaskTooBigNoti;
+    private LinearLayout mContainer;
+    private Cursor mCursor;
+    private ContentObserver mContentObserver;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,13 +44,27 @@ public class TaskDetailsActivity extends Activity {
 	mSpent_1 = (RatingBar) findViewById(R.id.spent_1);
 	mSpent_2 = (RatingBar) findViewById(R.id.spent_2);
 	
-	final Cursor cursor = TaskStore.getTaskDetails(uri, getContentResolver());
-	int expected = cursor.getInt(PomodoroIndex.EXPECTED);
+	mCursor = managedQuery(uri, TaskStore.POMODORO_PROJECTION, null, null, null);
+	mCursor.moveToFirst();
+	int expected = mCursor.getInt(PomodoroIndex.EXPECTED);
 	setExpectedRating(expected);
 	
-	mSpentPomodoros = cursor.getInt(PomodoroIndex.SPENT);
+	mSpentPomodoros = mCursor.getInt(PomodoroIndex.SPENT);
 	setSpentRating();
-	cursor.close();
+	
+	mContainer = (LinearLayout) findViewById(R.id.container);
+	
+	initializeInterrupts();
+	
+	mContentObserver = new ContentObserver(new Handler()) {
+	    @Override
+	    public void onChange(boolean selfChange) {
+		mCursor.requery();
+		mCursor.moveToFirst();
+		initializeInterrupts();
+		super.onChange(selfChange);
+	    }
+	};
 	
 	final Button startPomodoro = (Button) findViewById(R.id.start_pomodoro);
 	startPomodoro.setOnClickListener(new View.OnClickListener() {
@@ -67,6 +87,53 @@ public class TaskDetailsActivity extends Activity {
 		getContentResolver().update(uri, values, null, null);
 	    }
 	});
+    }
+
+    private void initializeInterrupts() {
+	final RatingBar interrupts_1 = (RatingBar) findViewById(R.id.interrupts_1);
+	final RatingBar interrupts_2 = (RatingBar) findViewById(R.id.interrupts_2);
+	final RatingBar interrupts_3 = (RatingBar) findViewById(R.id.interrupts_3);
+	final int interruptsCount = mCursor.getInt(PomodoroIndex.INTERRUPTS);
+	if (interruptsCount <= 6) {
+	    interrupts_1.setRating(interruptsCount);
+	    interrupts_2.setVisibility(View.GONE);
+	    interrupts_2.setRating(0);
+	    interrupts_3.setVisibility(View.GONE);
+	    interrupts_3.setRating(0);
+	} else if (interruptsCount <= 12){
+	    interrupts_1.setRating(6);
+	    interrupts_2.setVisibility(View.VISIBLE);
+	    interrupts_2.setRating(interruptsCount - 6);
+	    interrupts_3.setVisibility(View.GONE);
+	    interrupts_3.setRating(0);
+	} else {
+	    interrupts_1.setRating(6);
+	    interrupts_2.setVisibility(View.VISIBLE);
+	    interrupts_2.setRating(interruptsCount - 6);
+	    interrupts_3.setVisibility(View.VISIBLE);
+	    interrupts_3.setRating(interruptsCount - 12);
+	}
+    }
+
+    @Override
+    protected void onStart() {
+	mCursor.registerContentObserver(mContentObserver);
+	super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+	mCursor.unregisterContentObserver(mContentObserver);
+	super.onStop();
+    }
+
+    private void addInterrupt(final int rating) {
+	RatingBar second = new RatingBar(this);
+	second.setNumStars(6);
+	second.setRating(rating);
+	second.setStepSize(1.0f);
+	second.setIsIndicator(true);
+	mContainer.addView(second);
     }
 
     private void setExpectedRating(int expected) {
