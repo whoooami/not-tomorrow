@@ -23,6 +23,7 @@ public class TaskDetailsActivity extends Activity {
     public static final String ACTION_VIEW_DETAILS = "com.hilton.todo.VIEW_TASK_DETAILS";
     public static final String EXTRA_TASK_CONTENT = "task_content";
     public static final String EXTRA_TASK_STATUS = "task_status";
+    public static final String EXTRA_INTERRUPTS_COUNT = "interrupts_count";
     
     private RatingBar mExpected_1;
     private RatingBar mExpected_2;
@@ -90,6 +91,8 @@ public class TaskDetailsActivity extends Activity {
 		
 		final Intent i = new Intent(getApplication(), PomodoroClockActivity.class);
 		i.putExtra(EXTRA_TASK_CONTENT, getIntent().getStringExtra(EXTRA_TASK_CONTENT));
+		mCursor.moveToFirst();
+		i.putExtra(EXTRA_INTERRUPTS_COUNT, mCursor.getInt(PomodoroIndex.INTERRUPTS));
 		i.setData(uri);
 		startActivity(i);
 	    }
@@ -101,6 +104,7 @@ public class TaskDetailsActivity extends Activity {
     }
 
     private void initializeInterrupts() {
+	mCursor.moveToFirst();
 	final RatingBar interrupts_1 = (RatingBar) findViewById(R.id.interrupts_1);
 	final RatingBar interrupts_2 = (RatingBar) findViewById(R.id.interrupts_2);
 	final RatingBar interrupts_3 = (RatingBar) findViewById(R.id.interrupts_3);
@@ -129,6 +133,7 @@ public class TaskDetailsActivity extends Activity {
     @Override
     protected void onStart() {
 	mCursor.registerContentObserver(mContentObserver);
+	initializeInterrupts();
 	super.onStart();
     }
 
