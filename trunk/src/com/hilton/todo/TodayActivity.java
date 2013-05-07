@@ -450,6 +450,8 @@ public class TodayActivity extends Activity {
             
             ImageView dragger = (ImageView) view.findViewById(R.id.dragger);
             dragger.setVisibility(mTaskList.inDraggingMode() ? View.VISIBLE : View.GONE);
+            ImageView pomodoro = (ImageView) view.findViewById(R.id.pomodoro_card);
+            pomodoro.setVisibility(mTaskList.inDraggingMode() ? View.GONE : View.VISIBLE);
         }
 
         @Override
