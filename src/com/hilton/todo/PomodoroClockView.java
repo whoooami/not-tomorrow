@@ -12,12 +12,9 @@ import android.view.View;
 
 public class PomodoroClockView extends View {
     private static final String TAG = "PomodoroClockView";
-    private int mViewWidth;
-    private int mViewHeight;
-    private int mClockRadius;
+    private float mClockRadius;
     private RectF mWorkingArea;
     private RectF mRestArea;
-    private RectF mStatusPanel;
     private Paint mRestPaint;
     private Paint mWorkingPaint;
     private Paint mCountDownPaint;
@@ -57,10 +54,8 @@ public class PomodoroClockView extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 	super.onSizeChanged(w, h, oldw, oldh);
-	mViewHeight = h;
-	mViewWidth = w;
-	mClockRadius = h / 4;
-	final float top = 2.0f * h / 20.0f;
+	mClockRadius = Math.min(w, h) / 3.0f;
+	final float top = h/2.0f - mClockRadius;
 	final float left = w/2.0f - mClockRadius;
 	mRestArea.top = top;
 	mRestArea.left = left;
