@@ -452,6 +452,14 @@ public class TodayActivity extends Activity {
             dragger.setVisibility(mTaskList.inDraggingMode() ? View.VISIBLE : View.GONE);
             ImageView pomodoro = (ImageView) view.findViewById(R.id.pomodoro_card);
             pomodoro.setVisibility(mTaskList.inDraggingMode() ? View.GONE : View.VISIBLE);
+            pomodoro.setOnClickListener(new View.OnClickListener() {
+	        @Override
+	        public void onClick(View v) {
+	            Intent i = new Intent(getApplication(), TaskDetailsActivity.class);
+	            i.setData(uri);
+	            startActivity(i);
+	        }
+	    });
         }
 
         @Override
