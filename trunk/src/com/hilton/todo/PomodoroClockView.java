@@ -20,7 +20,6 @@ public class PomodoroClockView extends View {
     private Paint mCountDownPaint;
     private float mSweepAngle;
     private float mRemainingTime;
-    private OnTimeoutListener mTimeoutListener;
     
     public PomodoroClockView(Context context) {
 	this(context, null);
@@ -81,22 +80,8 @@ public class PomodoroClockView extends View {
 	canvas.drawArc(mWorkingArea, 270, 300, true, mWorkingPaint);
 	canvas.drawArc(mWorkingArea, 270, mSweepAngle, true, mCountDownPaint);
 	super.onDraw(canvas);
-	if (mRemainingTime <= 0.0f) {
-	    if (mTimeoutListener != null) {
-		mTimeoutListener.onTimeout();
-	    }
-	    return;
-	}
 	mRemainingTime -= 5.0f;
 	mSweepAngle += 1.0f;
 	postInvalidateDelayed(500, (int) mWorkingArea.left, (int) mWorkingArea.top, (int) mWorkingArea.right, (int) mWorkingArea.bottom);
-    }
-    
-    public void setOnTimeoutListener(OnTimeoutListener l) {
-	mTimeoutListener = l;
-    }
-    
-    public interface OnTimeoutListener {
-	public void onTimeout();
     }
 }
