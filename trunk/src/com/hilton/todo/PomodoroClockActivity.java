@@ -40,12 +40,16 @@ public class PomodoroClockActivity extends Activity {
 	super.onCreate(savedInstanceState);
 	setContentView(R.layout.pomodoro_clock);
 	
-	final TextView taskDescription = (TextView) findViewById(R.id.status_panel);
-	taskDescription.setText(getIntent().getStringExtra(TaskDetailsActivity.EXTRA_TASK_CONTENT));
 	
 	final Uri uri = getIntent().getData();
 	
+	mSpentPomodoros = getIntent().getIntExtra(TaskDetailsActivity.EXTRA_SPENT_POMODOROS, 1);
 	mInterruptsCount = getIntent().getIntExtra(TaskDetailsActivity.EXTRA_INTERRUPTS_COUNT, 0);
+
+	final TextView taskDescription = (TextView) findViewById(R.id.status_panel);
+	final String status = pomodoroOrder() + " of task \"" + getIntent().getStringExtra(TaskDetailsActivity.EXTRA_TASK_CONTENT) + "\"";
+	taskDescription.setText(status);
+	
 	final Button interrupt = (Button) findViewById(R.id.interrupt);
 	interrupt.setOnClickListener(new View.OnClickListener() {
 	    @Override
@@ -57,7 +61,6 @@ public class PomodoroClockActivity extends Activity {
 	    }
 	});
 	
-	mSpentPomodoros = getIntent().getIntExtra(TaskDetailsActivity.EXTRA_SPENT_POMODOROS, 1);
 	final Button cancel = (Button) findViewById(R.id.cancel);
 	cancel.setOnClickListener(new View.OnClickListener() {
 	    @Override
@@ -72,6 +75,10 @@ public class PomodoroClockActivity extends Activity {
 	
 	mRemainingTimeInSeconds = 1800; // 30 mins
 	updateClockStatus();
+    }
+
+    private String pomodoroOrder() {
+	return "Pomodoro #" + mSpentPomodoros;
     }
 
     private void updateClockStatus() {
