@@ -54,5 +54,6 @@
         <provider android:name="TaskProvider"
             android:authorities="com.hilton.todo.TaskProvider" />
         <service android:name="TaskRecyclerService" android:exported="false" />
+        <service android:name="PomodoroClockService" android:exported="false" />
     </application>
 </manifest> 
