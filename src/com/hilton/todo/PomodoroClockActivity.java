@@ -1,10 +1,15 @@
 package com.hilton.todo;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
@@ -36,13 +41,14 @@ public class PomodoroClockActivity extends Activity {
 	    }
 	}
     };
+    private IPomodoroClock mTheService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 	super.onCreate(savedInstanceState);
 	setContentView(R.layout.pomodoro_clock);
 	
-	
+	bindToService();
 	final Uri uri = getIntent().getData();
 	
 	mSpentPomodoros = getIntent().getIntExtra(TaskDetailsActivity.EXTRA_SPENT_POMODOROS, 1);
@@ -117,6 +123,7 @@ public class PomodoroClockActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+	unbindFromService();
 	mHandler.removeMessages(MSG_REFRESH_CLOCK);
 	mHandler.removeMessages(MSG_TERMINATE);
 	super.onDestroy();
@@ -128,4 +135,28 @@ public class PomodoroClockActivity extends Activity {
 	clock.setSweepAngle((1800.0f - mRemainingTimeInSeconds) / 5.0f);
 	super.onResume();
     }
+    
+    private void bindToService() {
+	final Intent i = new Intent();
+	i.setClass(getApplication(), PomodoroClockService.class);
+	bindService(i, mServiceConnection, Context.BIND_AUTO_CREATE);
+    }
+    
+    private void unbindFromService() {
+	if (mServiceConnection != null) {
+	    unbindService(mServiceConnection);
+	}
+    }
+    
+    private ServiceConnection mServiceConnection = new ServiceConnection() {
+
+	public void onServiceConnected(ComponentName className, IBinder obj) {
+	    Log.e(TAG, "service " + className + " connected as " + obj);
+	    mTheService = IPomodoroClock.Stub.asInterface(obj);
+	}
+	
+	public void onServiceDisconnected(ComponentName className) {
+	    Log.e(TAG, "service " + className + " is disconnected");
+	}
+    };
 }

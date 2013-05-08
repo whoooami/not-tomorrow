@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.os.RemoteException;
 import android.util.Log;
 
 import com.hilton.todo.TaskStore.TaskColumns;
@@ -17,6 +18,7 @@ public class PomodoroClockService extends Service {
     protected static final String TAG = "PomodoroClockService";
     private int mSpentPomodoros;
     private int mRemainingTimeInSeconds;
+    private IBinder mBinder;
     
     private final Handler mServiceHandler = new Handler() {
 	@Override
@@ -52,6 +54,7 @@ public class PomodoroClockService extends Service {
 	Log.e(TAG, "on create, here i come");
 	mSpentPomodoros = 0;
 	mRemainingTimeInSeconds = 0;
+	mBinder = new ServiceStub(this);
     }
 
     @Override
@@ -86,6 +89,42 @@ public class PomodoroClockService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-	return null;
+	Log.e(TAG, "on bind; new binder " + intent);
+	return mBinder;
+    }
+    
+    @Override
+    public boolean onUnbind(Intent intent) {
+	Log.e(TAG, "on unbind : " + intent);
+	return super.onUnbind(intent);
+    }
+
+    public int getRemainingTimeInSeconds() {
+	return mRemainingTimeInSeconds;
+    }
+    
+    public void cancelClock() {
+	// TODO: implement cancel
+	// cancel this pomodoro, subtract it
+	// clear remaining time
+	// stop ourself
+    }
+    
+    private static class ServiceStub extends IPomodoroClock.Stub {
+	PomodoroClockService mService;
+	
+	ServiceStub(PomodoroClockService s) {
+	    mService = s;
+	}
+
+	@Override
+	public int getRemainingTimeInSeconds() throws RemoteException {
+	    return mService.getRemainingTimeInSeconds();
+	}
+
+	@Override
+	public void cancelClock() throws RemoteException {
+	    mService.cancelClock();
+	}
     }
 }
