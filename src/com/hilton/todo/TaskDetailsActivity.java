@@ -60,19 +60,12 @@ public class TaskDetailsActivity extends Activity {
 
 	    @Override
 	    public void onClick(View v) {
-		if (mSpentPomodoros >= 12) {
-		    if (mOverflowNoti == null) {
-			mOverflowNoti = Toast.makeText(getApplication(), 
-				"You have spent too much time on this task. You should concenrate or divide it into smaller tasks.", 
-				Toast.LENGTH_SHORT);
-		    }
-		    mOverflowNoti.show();
-		}
-		mSpentPomodoros++;
-		setSpentRating();
-		final ContentValues values = new ContentValues(1);
-		values.put(TaskColumns.SPENT, mSpentPomodoros);
-		getContentResolver().update(uri, values, null, null);
+		final Intent si = new Intent(getApplication(), PomodoroClockService.class);
+		si.putExtra(EXTRA_TASK_CONTENT, getIntent().getStringExtra(EXTRA_TASK_CONTENT));
+		si.putExtra(EXTRA_INTERRUPTS_COUNT, mCursor.getInt(PomodoroIndex.INTERRUPTS));
+		si.putExtra(EXTRA_SPENT_POMODOROS, mSpentPomodoros);
+		si.setData(uri);
+		startService(si);
 		
 		final Intent i = new Intent(getApplication(), PomodoroClockActivity.class);
 		i.putExtra(EXTRA_TASK_CONTENT, getIntent().getStringExtra(EXTRA_TASK_CONTENT));
