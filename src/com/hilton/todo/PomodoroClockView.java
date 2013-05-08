@@ -73,11 +73,16 @@ public class PomodoroClockView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
+	Log.e(TAG, "on draw sweep angle " + mSweepAngle);
 	canvas.drawArc(mWorkingArea, 210, 60, true, mRestPaint);
 	canvas.drawArc(mWorkingArea, 270, 300, true, mWorkingPaint);
 	canvas.drawArc(mWorkingArea, 270, mSweepAngle, true, mCountDownPaint);
 	super.onDraw(canvas);
 	mSweepAngle += 1.0f;
 	postInvalidateDelayed(5000, (int) mWorkingArea.left, (int) mWorkingArea.top, (int) mWorkingArea.right, (int) mWorkingArea.bottom);
+    }
+    
+    public void setSweepAngle(final float s) {
+	mSweepAngle = s;
     }
 }

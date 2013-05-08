@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -15,6 +16,7 @@ import com.hilton.todo.TaskStore.TaskColumns;
 public class PomodoroClockActivity extends Activity {
     private static final int MSG_TERMINATE = 10;
     private static final int MSG_REFRESH_CLOCK = 0;
+    private static final String TAG = "PomodoroClockActivity";
     private int mInterruptsCount;
     private int mSpentPomodoros;
     private int mRemainingTimeInSeconds;
@@ -82,6 +84,7 @@ public class PomodoroClockActivity extends Activity {
     }
 
     private void updateClockStatus() {
+	Log.e(TAG, "updating clock status, remianing time " + mRemainingTimeInSeconds);
 	final TextView clockStatus = (TextView) findViewById(R.id.clock_status);
 	String status = "";
 	if (mRemainingTimeInSeconds <= 0) {
@@ -110,5 +113,19 @@ public class PomodoroClockActivity extends Activity {
 	clockStatus.setText(status);
 	mHandler.removeMessages(MSG_REFRESH_CLOCK);
 	mHandler.sendEmptyMessageDelayed(MSG_REFRESH_CLOCK, 1000);
+    }
+
+    @Override
+    protected void onDestroy() {
+	mHandler.removeMessages(MSG_REFRESH_CLOCK);
+	mHandler.removeMessages(MSG_TERMINATE);
+	super.onDestroy();
+    }
+
+    @Override
+    protected void onResume() {
+	final PomodoroClockView clock = (PomodoroClockView) findViewById(R.id.clock_view);
+	clock.setSweepAngle((1800.0f - mRemainingTimeInSeconds) / 5.0f);
+	super.onResume();
     }
 }
