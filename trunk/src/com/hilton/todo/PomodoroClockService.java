@@ -27,9 +27,7 @@ public class PomodoroClockService extends Service {
 	    case MSG_COUNTING_DOWN: {
 		Log.e(TAG, "couting down remaining: " + mRemainingTimeInSeconds);
 		if (mRemainingTimeInSeconds <= 0) {
-		    removeMessages(MSG_COUNTING_DOWN);
-		    removeMessages(MSG_STOP_SELF);
-		    sendEmptyMessageDelayed(MSG_STOP_SELF, 30 * 1000);
+		    quitService();
 		    return;
 		}
 		mRemainingTimeInSeconds--;
@@ -47,6 +45,7 @@ public class PomodoroClockService extends Service {
 	    super.handleMessage(msg);
 	}
     };
+    private Uri mTaskUri;
     
     @Override
     public void onCreate() {
@@ -61,9 +60,9 @@ public class PomodoroClockService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
 	Log.e(TAG, "on start command, got command " + intent);
 	mSpentPomodoros = intent.getIntExtra(TaskDetailsActivity.EXTRA_SPENT_POMODOROS, 0);
-	final Uri uri = intent.getData();
+	mTaskUri = intent.getData();
 	if (mRemainingTimeInSeconds <= 0) {
-	    startClock(uri);
+	    startClock(mTaskUri);
 	} else {
 	    Log.e(TAG, "an existing clock is on the go, do nothing");
 	}
@@ -104,12 +103,20 @@ public class PomodoroClockService extends Service {
     }
     
     public void cancelClock() {
-	// TODO: implement cancel
-	// cancel this pomodoro, subtract it
-	// clear remaining time
-	// stop ourself
+	mSpentPomodoros--;
+	final ContentValues values = new ContentValues(1);
+	values.put(TaskColumns.SPENT, mSpentPomodoros);
+	getContentResolver().update(mTaskUri, values, null, null);
+	mRemainingTimeInSeconds = 0;
+	quitService();
     }
     
+    private void quitService() {
+	mServiceHandler.removeMessages(MSG_COUNTING_DOWN);
+	mServiceHandler.removeMessages(MSG_STOP_SELF);
+	mServiceHandler.sendEmptyMessageDelayed(MSG_STOP_SELF, 30 * 1000);
+    }
+
     private static class ServiceStub extends IPomodoroClock.Stub {
 	PomodoroClockService mService;
 	
