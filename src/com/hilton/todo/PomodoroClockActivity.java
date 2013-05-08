@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.os.RemoteException;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -33,7 +34,7 @@ public class PomodoroClockActivity extends Activity {
 		finish();
 		break;
 	    case MSG_REFRESH_CLOCK:
-		mRemainingTimeInSeconds--;
+		mRemainingTimeInSeconds = getRemainingFromService();
 		updateClockStatus();
 		break;
 	    default:
@@ -81,8 +82,21 @@ public class PomodoroClockActivity extends Activity {
 	    }
 	});
 	
-	mRemainingTimeInSeconds = 1800; // 30 mins
+	mRemainingTimeInSeconds = getRemainingFromService();
 	updateClockStatus();
+    }
+
+    private int getRemainingFromService() {
+	if (mTheService == null) {
+	    return 1800;
+	}
+	int remaining = 1800;
+	try {
+	    remaining = mTheService.getRemainingTimeInSeconds();
+	} catch (RemoteException e) {
+	    Log.e(TAG, "remote excetion caught, ", e);
+	}
+	return remaining;
     }
 
     private String pomodoroOrder() {
@@ -153,6 +167,11 @@ public class PomodoroClockActivity extends Activity {
 	public void onServiceConnected(ComponentName className, IBinder obj) {
 	    Log.e(TAG, "service " + className + " connected as " + obj);
 	    mTheService = IPomodoroClock.Stub.asInterface(obj);
+	    try {
+		mRemainingTimeInSeconds = mTheService.getRemainingTimeInSeconds();
+	    } catch (RemoteException e) {
+		Log.e(TAG, "excepiton caught : ", e);
+	    }
 	}
 	
 	public void onServiceDisconnected(ComponentName className) {
