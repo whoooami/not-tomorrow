@@ -128,9 +128,4 @@ public class PomodoroClockActivity extends Activity {
 	clock.setSweepAngle((1800.0f - mRemainingTimeInSeconds) / 5.0f);
 	super.onResume();
     }
-
-    @Override
-    public void onBackPressed() {
-	moveTaskToBack(true);
-    }
 }
