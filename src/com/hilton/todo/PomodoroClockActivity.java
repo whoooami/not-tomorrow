@@ -74,16 +74,24 @@ public class PomodoroClockActivity extends Activity {
 	cancel.setOnClickListener(new View.OnClickListener() {
 	    @Override
 	    public void onClick(View v) {
-		mSpentPomodoros--;
-		final ContentValues values = new ContentValues(1);
-		values.put(TaskColumns.SPENT, mSpentPomodoros);
-		getContentResolver().update(uri, values, null, null);
+		cancelServiceClock();
 		finish();
 	    }
 	});
 	
 	mRemainingTimeInSeconds = getRemainingFromService();
 	updateClockStatus();
+    }
+
+    protected void cancelServiceClock() {
+	if (mTheService == null) {
+	    return;
+	}
+	try {
+	    mTheService.cancelClock();
+	} catch (RemoteException e) {
+	    Log.e(TAG, "exceiton ", e);
+	}
     }
 
     private int getRemainingFromService() {
