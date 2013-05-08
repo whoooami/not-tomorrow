@@ -29,6 +29,7 @@ public class PomodoroClockService extends Service {
     private static final int NOTIFICATION_ID = 10001;
     private String mTaskDescription;
     private int mTaskInterrupts;
+    private boolean mHasClient;
     
     private final Handler mServiceHandler = new Handler() {
 	@Override
@@ -67,6 +68,7 @@ public class PomodoroClockService extends Service {
 	mSpentPomodoros = 0;
 	mRemainingTimeInSeconds = 0;
 	mBinder = new ServiceStub(this);
+	mHasClient = false;
     }
 
     @Override
@@ -85,7 +87,7 @@ public class PomodoroClockService extends Service {
     }
 
     private void startClock(final Uri uri) {
-	mRemainingTimeInSeconds = 1800;
+	mRemainingTimeInSeconds = 310;
 	mSpentPomodoros++;
 	Log.e(TAG, "start clock: start a pomodoro clock. spent " + mSpentPomodoros);
 	final ContentValues values = new ContentValues(1);
@@ -101,24 +103,30 @@ public class PomodoroClockService extends Service {
 	final RemoteViews views = new RemoteViews(getPackageName(), R.layout.notification);
 	final NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
 	builder.setSmallIcon(R.drawable.ic_launcher);
-	builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_checked_normal));
+	if (mRemainingTimeInSeconds <= 0) {
+	    builder.setTicker("Pomodoro clock is finished.");
+	    builder.setOngoing(false);
+	} else {
+	    if (mRemainingTimeInSeconds >= 300) {
+		views.setTextViewText(R.id.description, "Now is working time!");
+	    } else {
+		views.setTextViewText(R.id.description, "Take a good rest!");
+	    }
+	    builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_checked_normal));
+	    builder.setOngoing(true);
+	    Intent intent = createIntent();
+	    builder.setContentIntent(PendingIntent.getActivity(getApplication(), 0, intent, 0));
+	    builder.setContent(views);
+	}
 	if (mRemainingTimeInSeconds == 1800) {
 	    builder.setTicker("Starting a Pomodoro clock.");
 	} else if (mRemainingTimeInSeconds == 300) {
-	    builder.setVibrate(new long[] {100, 100, 100, 100});
+	    // TODO: When clock activity is in foreground, use another way to notify
+	    if (!mHasClient) {
+		builder.setVibrate(new long[] {100, 100, 100, 100});
+	    }
 	    builder.setTicker("Time to take a good rest!");
-	} else if (mRemainingTimeInSeconds <= 0) {
-	    builder.setTicker("Pomodoro clock is finished.");
 	}
-	if (mRemainingTimeInSeconds >= 300) {
-	    views.setTextViewText(R.id.description, "Now is working time!");
-	} else {
-	    views.setTextViewText(R.id.description, "Take a good rest!");
-	}
-	builder.setOngoing(true);
-	Intent intent = createIntent();
-	builder.setContentIntent(PendingIntent.getActivity(getApplication(), 0, intent, 0));
-	builder.setContent(views);
 	Notification notification = builder.build();
 	
 	manager.notify(NOTIFICATION_ID, notification);
@@ -142,18 +150,21 @@ public class PomodoroClockService extends Service {
     @Override
     public void onDestroy() {
 	Log.e(TAG, "on destory, good bye crule worold.");
+	mHasClient = false;
 	super.onDestroy();
     }
 
     @Override
     public IBinder onBind(Intent intent) {
 	Log.e(TAG, "on bind; new binder " + intent);
+	mHasClient = true;
 	return mBinder;
     }
     
     @Override
     public boolean onUnbind(Intent intent) {
 	Log.e(TAG, "on unbind : " + intent);
+	mHasClient = false;
 	return super.onUnbind(intent);
     }
 
