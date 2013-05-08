@@ -13,5 +13,6 @@
 	<classpathentry kind="lib" path="libs/gson-2.1.jar"/>
 	<classpathentry kind="lib" path="libs/jsr305-1.3.9.jar"/>
 	<classpathentry kind="src" path="gen"/>
+	<classpathentry kind="lib" path="libs/android-support-v13.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

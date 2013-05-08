@@ -1,14 +1,21 @@
 package com.hilton.todo;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.RemoteViews;
 
 import com.hilton.todo.TaskStore.TaskColumns;
 
@@ -19,6 +26,9 @@ public class PomodoroClockService extends Service {
     private int mSpentPomodoros;
     private int mRemainingTimeInSeconds;
     private IBinder mBinder;
+    private static final int NOTIFICATION_ID = 10001;
+    private String mTaskDescription;
+    private int mTaskInterrupts;
     
     private final Handler mServiceHandler = new Handler() {
 	@Override
@@ -31,6 +41,9 @@ public class PomodoroClockService extends Service {
 		    return;
 		}
 		mRemainingTimeInSeconds--;
+		if (mRemainingTimeInSeconds == 300) {
+		    updateNotification();
+		}
 		removeMessages(MSG_COUNTING_DOWN);
 		sendEmptyMessageDelayed(MSG_COUNTING_DOWN, 1000);
 		break;
@@ -60,6 +73,8 @@ public class PomodoroClockService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
 	Log.e(TAG, "on start command, got command " + intent);
 	mSpentPomodoros = intent.getIntExtra(TaskDetailsActivity.EXTRA_SPENT_POMODOROS, 0);
+	mTaskDescription = intent.getStringExtra(TaskDetailsActivity.EXTRA_TASK_CONTENT);
+	mTaskInterrupts = intent.getIntExtra(TaskDetailsActivity.EXTRA_INTERRUPTS_COUNT, 0);
 	mTaskUri = intent.getData();
 	if (mRemainingTimeInSeconds <= 0) {
 	    startClock(mTaskUri);
@@ -78,8 +93,52 @@ public class PomodoroClockService extends Service {
 	getContentResolver().update(uri, values, null, null);
 	mServiceHandler.removeMessages(MSG_COUNTING_DOWN);
 	mServiceHandler.sendEmptyMessageDelayed(MSG_COUNTING_DOWN, 1000);
+	updateNotification();
     }
 
+    private void updateNotification() {
+	final NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+	final RemoteViews views = new RemoteViews(getPackageName(), R.layout.notification);
+	final NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+	builder.setSmallIcon(R.drawable.ic_launcher);
+	builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_checked_normal));
+	if (mRemainingTimeInSeconds == 1800) {
+	    builder.setTicker("Starting a Pomodoro clock.");
+	} else if (mRemainingTimeInSeconds == 300) {
+	    builder.setVibrate(new long[] {100, 100, 100, 100});
+	    builder.setTicker("Time to take a good rest!");
+	} else if (mRemainingTimeInSeconds <= 0) {
+	    builder.setTicker("Pomodoro clock is finished.");
+	}
+	if (mRemainingTimeInSeconds >= 300) {
+	    views.setTextViewText(R.id.description, "Now is working time!");
+	} else {
+	    views.setTextViewText(R.id.description, "Take a good rest!");
+	}
+	builder.setOngoing(true);
+	Intent intent = createIntent();
+	builder.setContentIntent(PendingIntent.getActivity(getApplication(), 0, intent, 0));
+	builder.setContent(views);
+	Notification notification = builder.build();
+	
+	manager.notify(NOTIFICATION_ID, notification);
+    }
+
+    private Intent createIntent() {
+	Intent intent = new Intent(getApplication(), PomodoroClockActivity.class);
+	intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+	intent.setData(mTaskUri);
+	intent.putExtra(TaskDetailsActivity.EXTRA_TASK_CONTENT, mTaskDescription);
+	intent.putExtra(TaskDetailsActivity.EXTRA_INTERRUPTS_COUNT, mTaskInterrupts);
+	intent.putExtra(TaskDetailsActivity.EXTRA_SPENT_POMODOROS, mSpentPomodoros);
+	return intent;
+    }
+
+    private void cancelNotification() {
+	final NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+	manager.cancel(NOTIFICATION_ID);
+    }
+    
     @Override
     public void onDestroy() {
 	Log.e(TAG, "on destory, good bye crule worold.");
@@ -103,6 +162,7 @@ public class PomodoroClockService extends Service {
     }
     
     public void cancelClock() {
+	cancelNotification();
 	mSpentPomodoros--;
 	final ContentValues values = new ContentValues(1);
 	values.put(TaskColumns.SPENT, mSpentPomodoros);
@@ -112,6 +172,8 @@ public class PomodoroClockService extends Service {
     }
     
     private void quitService() {
+	updateNotification();
+	cancelNotification();
 	mServiceHandler.removeMessages(MSG_COUNTING_DOWN);
 	mServiceHandler.removeMessages(MSG_STOP_SELF);
 	mServiceHandler.sendEmptyMessageDelayed(MSG_STOP_SELF, 30 * 1000);
