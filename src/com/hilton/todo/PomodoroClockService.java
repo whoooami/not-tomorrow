@@ -87,7 +87,7 @@ public class PomodoroClockService extends Service {
     }
 
     private void startClock(final Uri uri) {
-	mRemainingTimeInSeconds = 310;
+	mRemainingTimeInSeconds = 1800;
 	mSpentPomodoros++;
 	Log.e(TAG, "start clock: start a pomodoro clock. spent " + mSpentPomodoros);
 	final ContentValues values = new ContentValues(1);
