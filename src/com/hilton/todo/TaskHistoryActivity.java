@@ -65,6 +65,7 @@ public class TaskHistoryActivity extends ExpandableListActivity {
         addContentView(v, new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
         list.setEmptyView(v);
         list.setBackgroundColor(getResources().getColor(R.color.white));
+        list.setCacheColorHint(getResources().getColor(R.color.white));
     }
 
     @Override
