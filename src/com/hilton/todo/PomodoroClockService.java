@@ -114,10 +114,10 @@ public class PomodoroClockService extends Service {
 	    }
 	    builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_checked_normal));
 	    builder.setOngoing(true);
-	    Intent intent = createIntent();
-	    builder.setContentIntent(PendingIntent.getActivity(getApplication(), 0, intent, 0));
-	    builder.setContent(views);
 	}
+	Intent intent = createIntent();
+	builder.setContentIntent(PendingIntent.getActivity(getApplication(), 0, intent, 0));
+	builder.setContent(views);
 	if (mRemainingTimeInSeconds == 1800) {
 	    builder.setTicker("Starting a Pomodoro clock.");
 	} else if (mRemainingTimeInSeconds == 300) {
