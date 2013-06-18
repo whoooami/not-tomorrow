@@ -16,7 +16,7 @@
         android:paddingBottom="5dip"
         style="@style/header_text"/>
 
-    <com.hilton.todo.TaskListView
+    <com.hilton.todo.TodayTaskListView
         android:id="@+id/task_list"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
