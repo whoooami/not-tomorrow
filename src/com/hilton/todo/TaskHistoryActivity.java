@@ -18,7 +18,6 @@ import android.database.ContentObserver;
 import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -36,9 +35,9 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
-import android.widget.Toast;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.hilton.todo.TaskStore.ProjectionIndex;
 import com.hilton.todo.TaskStore.TaskColumns;
@@ -56,7 +55,7 @@ public class TaskHistoryActivity extends ExpandableListActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.white)));
+        getWindow().setBackgroundDrawableResource(R.color.white);
         final Cursor cursor = getContentResolver().query(TaskStore.CONTENT_URI, TaskStore.PROJECTION, TaskColumns.TYPE + " = ?", 
         	new String[]{String.valueOf(TaskStore.TYPE_HISTORY)}, TaskColumns.DAY + " DESC");
         mAdapter = new TaskHistoryExpandableListAdapter(getApplication(), cursor);
@@ -65,6 +64,7 @@ public class TaskHistoryActivity extends ExpandableListActivity {
         final View v = LayoutInflater.from(getApplication()).inflate(R.layout.empty_history, null);
         addContentView(v, new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
         list.setEmptyView(v);
+        list.setBackgroundColor(getResources().getColor(R.color.white));
     }
 
     @Override
