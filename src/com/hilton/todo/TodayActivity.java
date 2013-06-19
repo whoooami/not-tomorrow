@@ -460,6 +460,7 @@ public class TodayActivity extends Activity {
 	            i.putExtra(TaskDetailsActivity.EXTRA_TASK_STATUS, done != 0);
 	            i.setData(uri);
 	            startActivity(i);
+	            overridePendingTransition(R.anim.activity_enter_in, R.anim.activity_enter_out);
 	        }
 	    });
         }
