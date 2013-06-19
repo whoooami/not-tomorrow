@@ -158,6 +158,12 @@ public class PomodoroClockActivity extends Activity {
 	super.onResume();
     }
     
+    @Override
+    public void onBackPressed() {
+	super.onBackPressed();
+	overridePendingTransition(R.anim.activity_leave_in, R.anim.activity_leave_out);
+    }
+    
     private void bindToService() {
 	final Intent i = new Intent();
 	i.setClass(getApplication(), PomodoroClockService.class);

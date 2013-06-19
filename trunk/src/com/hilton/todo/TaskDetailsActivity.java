@@ -73,6 +73,7 @@ public class TaskDetailsActivity extends Activity {
 		i.putExtra(EXTRA_SPENT_POMODOROS, mSpentPomodoros);
 		i.setData(uri);
 		startActivity(i);
+		overridePendingTransition(R.anim.activity_enter_in, R.anim.activity_enter_out);
 	    }
 	});
 	startPomodoro.setEnabled(!taskIsDone);
@@ -130,7 +131,13 @@ public class TaskDetailsActivity extends Activity {
 	mCursor.close();
 	super.onDestroy();
     }
-
+    
+    @Override
+    public void onBackPressed() {
+	super.onBackPressed();
+	overridePendingTransition(R.anim.activity_leave_in, R.anim.activity_leave_out);
+    }
+    
     private void setExpectedRating(int expected) {
 	if (expected >= 6) {
 	    mExpected_1.setRating(6);
