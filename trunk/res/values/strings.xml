@@ -30,4 +30,21 @@
     <string name="push">Push to Tomorrow</string>
     <string name="reorder">Reorder</string>
     <string name="description_missing">Please enter task description.</string>
+    <string name="sync_with_google">Sync with Google Tasks</string>
+    <string name="task_tip_unfinished">Unfinished, needs action.</string>
+    <string name="task_tip_completed">Task is completed and takes # hours.</string>
+    <string name="task_tip_complicated">Task is too complex, divid it.</string>
+    <string name="pomodoro_order">Pomodoro #$ of task \"@\"</string>
+    <string name="work_time">Work time:   -</string>
+    <string name="rest_time">Rest time:  -</string>
+    <string name="pomodoro_finished">"Pomodoro clock is finished."</string>
+    <string name="pomodoro_start">"Starting a Pomodoro clock."</string>
+    <string name="noti_work_time">"Now is working time!"</string>
+    <string name="noti_rest_time">"Take a good rest!"</string>
+    <string name="pomodoro_expected">"Pomodoros Expected:"</string>
+    <string name="pomodoro_spent">Pomodoros Spent:</string>
+    <string name="start_pomodoro">Start a Pomodoro</string>
+    <string name="interrupts">Interrupts:</string>
+    <string name="interrupt">Interrupt</string>
+    <string name="pomodoro_clock">Pomodoro clock</string>
 </resources>
