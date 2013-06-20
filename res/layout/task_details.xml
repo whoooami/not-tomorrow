@@ -12,14 +12,13 @@
         android:layout_width="wrap_content"
         android:singleLine="true"
         android:textSize="18sp"
-        style="@style/task_text"
-        android:text="Unfinished"/>
+        style="@style/task_text"/>
     
     <TextView android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:singleLine="true"
         style="@style/task_text"
-        android:text="Pomodoros Expected:"/>
+        android:text="@string/pomodoro_expected"/>
 
     <RatingBar android:id="@+id/expected_1"
         android:layout_width="wrap_content"
@@ -41,7 +40,7 @@
         android:layout_height="wrap_content"
         android:singleLine="true"
         style="@style/task_text"
-        android:text="Pomodoros Spent:"/>
+        android:text="@string/pomodoro_spent"/>
 
     <RatingBar android:id="@+id/spent_1"
         android:layout_width="wrap_content"
@@ -63,13 +62,13 @@
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="Start a Pomodoro"/>
+        android:text="@string/start_pomodoro"/>
     
     <TextView android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:singleLine="true"
         style="@style/task_text"
-        android:text="Interrupts:"/>
+        android:text="@string/interrupts"/>
 
     <RatingBar android:id="@+id/interrupts_1"
         android:layout_width="wrap_content"

@@ -104,13 +104,13 @@ public class PomodoroClockService extends Service {
 	final NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
 	builder.setSmallIcon(R.drawable.ic_launcher);
 	if (mRemainingTimeInSeconds <= 0) {
-	    builder.setTicker("Pomodoro clock is finished.");
+	    builder.setTicker(getString(R.string.pomodoro_finished));
 	    builder.setOngoing(false);
 	} else {
 	    if (mRemainingTimeInSeconds >= 300) {
-		views.setTextViewText(R.id.description, "Now is working time!");
+		views.setTextViewText(R.id.description, getString(R.string.noti_work_time));
 	    } else {
-		views.setTextViewText(R.id.description, "Take a good rest!");
+		views.setTextViewText(R.id.description, getString(R.string.noti_rest_time));
 	    }
 	    builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_checked_normal));
 	    builder.setOngoing(true);
@@ -119,13 +119,13 @@ public class PomodoroClockService extends Service {
 	builder.setContentIntent(PendingIntent.getActivity(getApplication(), 0, intent, 0));
 	builder.setContent(views);
 	if (mRemainingTimeInSeconds == 1800) {
-	    builder.setTicker("Starting a Pomodoro clock.");
+	    builder.setTicker(getString(R.string.pomodoro_start));
 	} else if (mRemainingTimeInSeconds == 300) {
 	    // TODO: When clock activity is in foreground, use another way to notify
 	    if (!mHasClient) {
 		builder.setVibrate(new long[] {100, 100, 100, 100});
 	    }
-	    builder.setTicker("Time to take a good rest!");
+	    builder.setTicker(getString(R.string.noti_rest_time));
 	}
 	Notification notification = builder.build();
 	

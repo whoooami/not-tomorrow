@@ -79,7 +79,9 @@ public class TaskDetailsActivity extends Activity {
 	startPomodoro.setEnabled(!taskIsDone);
 	
 	final TextView statusPanel = (TextView) findViewById(R.id.status_panel);
-	statusPanel.setText(taskIsDone ? "Task is completed and takes " + mSpentPomodoros*0.5f + " hours." : "Unfinished, needs action.");
+	statusPanel.setText(taskIsDone ? 
+		getString(R.string.task_tip_completed).replaceAll("#", String.valueOf(mSpentPomodoros*0.5f)) : 
+		getString(R.string.task_tip_unfinished));
     }
 
     private void setInterrupts() {
@@ -196,7 +198,7 @@ public class TaskDetailsActivity extends Activity {
 
     private void warnTaskTooBig() {
 	if (mTaskTooBigNoti == null) {
-	    mTaskTooBigNoti = Toast.makeText(getApplication(), "Task is too complex, divid it.", Toast.LENGTH_SHORT);
+	    mTaskTooBigNoti = Toast.makeText(getApplication(), R.string.task_tip_complicated, Toast.LENGTH_SHORT);
 	}
 	mTaskTooBigNoti.show();
     }

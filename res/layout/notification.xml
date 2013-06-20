@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="5dip"
         android:singleLine="true"
-        android:text="Pomodoro clock"
+        android:text="@string/pomodoro_clock"
         android:textSize="18sp" />
 
     <TextView
@@ -21,7 +21,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="5dip"
-        android:singleLine="true"
-        android:text="Working time" />
+        android:singleLine="true" />
 
 </LinearLayout>

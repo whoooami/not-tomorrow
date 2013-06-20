@@ -258,7 +258,7 @@ public class TodayActivity extends Activity {
 	menu.add(0, START_TOMORROW, 0, R.string.goto_tomorrow);
 	menu.add(0, VIEW_HISTORY, 0, R.string.view_history);
 	menu.add(0, REORDER, 0, R.string.reorder);
-	menu.add(0, SYNC_GOOGLE_TASK, 0, "Sync");
+	menu.add(0, SYNC_GOOGLE_TASK, 0, R.string.sync_with_google);
 	return true;
     }
     

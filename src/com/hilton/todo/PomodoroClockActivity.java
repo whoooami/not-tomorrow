@@ -56,7 +56,7 @@ public class PomodoroClockActivity extends Activity {
 	mInterruptsCount = getIntent().getIntExtra(TaskDetailsActivity.EXTRA_INTERRUPTS_COUNT, 0);
 
 	final TextView taskDescription = (TextView) findViewById(R.id.status_panel);
-	final String status = pomodoroOrder() + " of task \"" + getIntent().getStringExtra(TaskDetailsActivity.EXTRA_TASK_CONTENT) + "\"";
+	final String status = pomodoroOrder().replace("@", getIntent().getStringExtra(TaskDetailsActivity.EXTRA_TASK_CONTENT));
 	taskDescription.setText(status);
 	
 	final Button interrupt = (Button) findViewById(R.id.interrupt);
@@ -109,7 +109,7 @@ public class PomodoroClockActivity extends Activity {
     }
 
     private String pomodoroOrder() {
-	return "Pomodoro #" + mSpentPomodoros;
+	return getString(R.string.pomodoro_order).replace("$", String.valueOf(mSpentPomodoros));
     }
 
     private void updateClockStatus() {
@@ -127,11 +127,11 @@ public class PomodoroClockActivity extends Activity {
 	int min = mRemainingTimeInSeconds / 60;
 	int sec = mRemainingTimeInSeconds % 60;
 	if (mRemainingTimeInSeconds >= 300) {
-	    status = "Work time:   -";
+	    status = getString(R.string.work_time);
 	    min = (mRemainingTimeInSeconds - 300) / 60;
 	    sec = (mRemainingTimeInSeconds - 300) % 60;
 	} else {
-	    status = "Rest time:  -";
+	    status = getString(R.string.rest_time);
 	}
 	status += min;
 	status += ":";
