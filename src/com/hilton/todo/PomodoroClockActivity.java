@@ -76,6 +76,7 @@ public class PomodoroClockActivity extends Activity {
 	    public void onClick(View v) {
 		cancelServiceClock();
 		finish();
+		overridePendingTransition(R.anim.activity_leave_in, R.anim.activity_leave_out);
 	    }
 	});
 	
