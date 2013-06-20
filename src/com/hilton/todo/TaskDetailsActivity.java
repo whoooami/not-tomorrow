@@ -38,7 +38,7 @@ public class TaskDetailsActivity extends Activity {
 	setContentView(R.layout.task_details);
 	final Uri uri = getIntent().getData();
 	setTitle(getIntent().getStringExtra(EXTRA_TASK_CONTENT));
-	
+	getWindow().setBackgroundDrawableResource(R.color.white);
 	final boolean taskIsDone = getIntent().getBooleanExtra(EXTRA_TASK_STATUS, false);
 	
 	
