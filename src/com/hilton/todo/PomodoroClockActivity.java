@@ -109,7 +109,7 @@ public class PomodoroClockActivity extends Activity {
     }
 
     private String pomodoroOrder() {
-	return getString(R.string.pomodoro_order).replace("$", String.valueOf(mSpentPomodoros));
+	return getString(R.string.pomodoro_order).replace("$", String.valueOf(mSpentPomodoros + 1));
     }
 
     private void updateClockStatus() {
