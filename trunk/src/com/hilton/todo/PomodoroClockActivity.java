@@ -97,9 +97,9 @@ public class PomodoroClockActivity extends Activity {
 
     private int getRemainingFromService() {
 	if (mTheService == null) {
-	    return 1800;
+	    return PomodoroClockService.POMODORO_CLOCK_DURATION;
 	}
-	int remaining = 1800;
+	int remaining = PomodoroClockService.POMODORO_CLOCK_DURATION;
 	try {
 	    remaining = mTheService.getRemainingTimeInSeconds();
 	} catch (RemoteException e) {
@@ -126,10 +126,10 @@ public class PomodoroClockActivity extends Activity {
 	}
 	int min = mRemainingTimeInSeconds / 60;
 	int sec = mRemainingTimeInSeconds % 60;
-	if (mRemainingTimeInSeconds >= 300) {
+	if (mRemainingTimeInSeconds >= PomodoroClockService.POMODORO_CLOCK_REST_DURATION) {
 	    status = getString(R.string.work_time);
-	    min = (mRemainingTimeInSeconds - 300) / 60;
-	    sec = (mRemainingTimeInSeconds - 300) % 60;
+	    min = (mRemainingTimeInSeconds - PomodoroClockService.POMODORO_CLOCK_REST_DURATION) / 60;
+	    sec = (mRemainingTimeInSeconds - PomodoroClockService.POMODORO_CLOCK_REST_DURATION) % 60;
 	} else {
 	    status = getString(R.string.rest_time);
 	}

@@ -20,6 +20,8 @@ import android.widget.RemoteViews;
 import com.hilton.todo.TaskStore.TaskColumns;
 
 public class PomodoroClockService extends Service {
+    static final int POMODORO_CLOCK_REST_DURATION = 300;
+    static final int POMODORO_CLOCK_DURATION = 1800;
     private static final int MSG_COUNTING_DOWN = 10;
     private static final int MSG_STOP_SELF = 11;
     protected static final String TAG = "PomodoroClockService";
@@ -43,7 +45,7 @@ public class PomodoroClockService extends Service {
 		    return;
 		}
 		mRemainingTimeInSeconds--;
-		if (mRemainingTimeInSeconds == 300) {
+		if (mRemainingTimeInSeconds == POMODORO_CLOCK_REST_DURATION) {
 		    updateNotification();
 		}
 		removeMessages(MSG_COUNTING_DOWN);
@@ -88,7 +90,7 @@ public class PomodoroClockService extends Service {
     }
 
     private void startClock() {
-	mRemainingTimeInSeconds = 1800;
+	mRemainingTimeInSeconds = POMODORO_CLOCK_DURATION;
 	mServiceHandler.removeMessages(MSG_COUNTING_DOWN);
 	mServiceHandler.sendEmptyMessageDelayed(MSG_COUNTING_DOWN, 1000);
 	updateNotification();
@@ -111,7 +113,7 @@ public class PomodoroClockService extends Service {
 	    builder.setTicker(getString(R.string.pomodoro_finished));
 	    builder.setOngoing(false);
 	} else {
-	    if (mRemainingTimeInSeconds >= 300) {
+	    if (mRemainingTimeInSeconds >= POMODORO_CLOCK_REST_DURATION) {
 		views.setTextViewText(R.id.description, getString(R.string.noti_work_time));
 	    } else {
 		views.setTextViewText(R.id.description, getString(R.string.noti_rest_time));
@@ -122,9 +124,9 @@ public class PomodoroClockService extends Service {
 	Intent intent = createIntent();
 	builder.setContentIntent(PendingIntent.getActivity(getApplication(), 0, intent, 0));
 	builder.setContent(views);
-	if (mRemainingTimeInSeconds == 1800) {
+	if (mRemainingTimeInSeconds == POMODORO_CLOCK_DURATION) {
 	    builder.setTicker(getString(R.string.pomodoro_start));
-	} else if (mRemainingTimeInSeconds == 300) {
+	} else if (mRemainingTimeInSeconds == POMODORO_CLOCK_REST_DURATION) {
 	    // TODO: When clock activity is in foreground, use another way to notify
 	    if (!mHasClient) {
 		builder.setVibrate(new long[] {100, 100, 100, 100});
