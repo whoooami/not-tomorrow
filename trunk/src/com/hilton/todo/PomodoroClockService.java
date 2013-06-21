@@ -103,37 +103,37 @@ public class PomodoroClockService extends Service {
 	values.put(TaskColumns.SPENT, mSpentPomodoros);
 	getContentResolver().update(mTaskUri, values, null, null);
     }
-
     private void updateNotification() {
 	final NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-	final RemoteViews views = new RemoteViews(getPackageName(), R.layout.notification);
-	final NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-	builder.setSmallIcon(R.drawable.ic_launcher);
+	final Notification notification = new Notification();
+	final String title = getString(R.string.pomodoro_clock);
+	String message = getString(R.string.noti_work_time);
+	notification.icon = R.drawable.ic_launcher;
+	notification.defaults = 0;
+	notification.when = System.currentTimeMillis();
 	if (mRemainingTimeInSeconds <= 0) {
-	    builder.setTicker(getString(R.string.pomodoro_finished));
-	    builder.setOngoing(false);
+	    notification.tickerText = getString(R.string.pomodoro_finished);
+	    notification.flags = 0;
 	} else {
 	    if (mRemainingTimeInSeconds >= POMODORO_CLOCK_REST_DURATION) {
-		views.setTextViewText(R.id.description, getString(R.string.noti_work_time));
+		message = getString(R.string.noti_work_time);
 	    } else {
-		views.setTextViewText(R.id.description, getString(R.string.noti_rest_time));
+		message = getString(R.string.noti_rest_time);
 	    }
-	    builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_checked_normal));
-	    builder.setOngoing(true);
+	    notification.flags = Notification.FLAG_ONGOING_EVENT;
 	}
 	Intent intent = createIntent();
-	builder.setContentIntent(PendingIntent.getActivity(getApplication(), 0, intent, 0));
-	builder.setContent(views);
+	PendingIntent pi = PendingIntent.getActivity(getApplication(), 0, intent, 0);
 	if (mRemainingTimeInSeconds == POMODORO_CLOCK_DURATION) {
-	    builder.setTicker(getString(R.string.pomodoro_start));
+	    notification.tickerText = getString(R.string.pomodoro_start);
 	} else if (mRemainingTimeInSeconds == POMODORO_CLOCK_REST_DURATION) {
 	    // TODO: When clock activity is in foreground, use another way to notify
 	    if (!mHasClient) {
-		builder.setVibrate(new long[] {100, 100, 100, 100});
+		notification.vibrate = new long[] {100, 100, 100, 100};
 	    }
-	    builder.setTicker(getString(R.string.noti_rest_time));
+	    notification.tickerText = getString(R.string.noti_rest_time);
 	}
-	Notification notification = builder.build();
+	notification.setLatestEventInfo(getApplication(), title, message, pi);
 	
 	manager.notify(NOTIFICATION_ID, notification);
     }
