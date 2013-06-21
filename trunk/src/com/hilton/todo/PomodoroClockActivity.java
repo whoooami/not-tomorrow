@@ -54,10 +54,6 @@ public class PomodoroClockActivity extends Activity {
 	
 	mSpentPomodoros = getIntent().getIntExtra(TaskDetailsActivity.EXTRA_SPENT_POMODOROS, 1);
 	mInterruptsCount = getIntent().getIntExtra(TaskDetailsActivity.EXTRA_INTERRUPTS_COUNT, 0);
-
-	final TextView taskDescription = (TextView) findViewById(R.id.status_panel);
-	final String status = pomodoroOrder().replace("@", getIntent().getStringExtra(TaskDetailsActivity.EXTRA_TASK_CONTENT));
-	taskDescription.setText(status);
 	
 	final Button interrupt = (Button) findViewById(R.id.interrupt);
 	interrupt.setOnClickListener(new View.OnClickListener() {
@@ -82,6 +78,10 @@ public class PomodoroClockActivity extends Activity {
 	
 	mRemainingTimeInSeconds = getRemainingFromService();
 	updateClockStatus();
+	
+	final TextView taskDescription = (TextView) findViewById(R.id.status_panel);
+	final String status = pomodoroOrder().replace("@", getIntent().getStringExtra(TaskDetailsActivity.EXTRA_TASK_CONTENT));
+	taskDescription.setText(status);
     }
 
     protected void cancelServiceClock() {

@@ -38,6 +38,7 @@ public class PomodoroClockService extends Service {
 	    case MSG_COUNTING_DOWN: {
 		Log.e(TAG, "couting down remaining: " + mRemainingTimeInSeconds);
 		if (mRemainingTimeInSeconds <= 0) {
+		    incrementSpent();
 		    quitService();
 		    return;
 		}
@@ -79,23 +80,26 @@ public class PomodoroClockService extends Service {
 	mTaskInterrupts = intent.getIntExtra(TaskDetailsActivity.EXTRA_INTERRUPTS_COUNT, 0);
 	mTaskUri = intent.getData();
 	if (mRemainingTimeInSeconds <= 0) {
-	    startClock(mTaskUri);
+	    startClock();
 	} else {
 	    Log.e(TAG, "an existing clock is on the go, do nothing");
 	}
 	return super.onStartCommand(intent, flags, startId);
     }
 
-    private void startClock(final Uri uri) {
+    private void startClock() {
 	mRemainingTimeInSeconds = 1800;
+	mServiceHandler.removeMessages(MSG_COUNTING_DOWN);
+	mServiceHandler.sendEmptyMessageDelayed(MSG_COUNTING_DOWN, 1000);
+	updateNotification();
+    }
+
+    private void incrementSpent() {
 	mSpentPomodoros++;
 	Log.e(TAG, "start clock: start a pomodoro clock. spent " + mSpentPomodoros);
 	final ContentValues values = new ContentValues(1);
 	values.put(TaskColumns.SPENT, mSpentPomodoros);
-	getContentResolver().update(uri, values, null, null);
-	mServiceHandler.removeMessages(MSG_COUNTING_DOWN);
-	mServiceHandler.sendEmptyMessageDelayed(MSG_COUNTING_DOWN, 1000);
-	updateNotification();
+	getContentResolver().update(mTaskUri, values, null, null);
     }
 
     private void updateNotification() {
@@ -174,7 +178,6 @@ public class PomodoroClockService extends Service {
     
     public void cancelClock() {
 	cancelNotification();
-	mSpentPomodoros--;
 	final ContentValues values = new ContentValues(1);
 	values.put(TaskColumns.SPENT, mSpentPomodoros);
 	getContentResolver().update(mTaskUri, values, null, null);
