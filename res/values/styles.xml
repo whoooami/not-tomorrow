@@ -32,4 +32,9 @@
         <item name="android:textColor">@color/header</item>
         <item name="android:textSize">20sp</item>
     </style>
+    <style name="pomodoro_ratingbar" parent="@android:style/Widget.RatingBar">
+        <item name="android:progressDrawable">@drawable/pomodoro_ratingbar</item>
+        <item name="android:minHeight">48dip</item>
+        <item name="android:maxHeight">48dip</item>
+    </style>
 </resources>

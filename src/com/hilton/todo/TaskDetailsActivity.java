@@ -23,6 +23,7 @@ public class TaskDetailsActivity extends Activity {
     public static final String EXTRA_TASK_STATUS = "task_status";
     public static final String EXTRA_INTERRUPTS_COUNT = "interrupts_count";
     public static final String EXTRA_SPENT_POMODOROS = "spent_pomodoros";
+    private static final String TAG = null;
     
     private RatingBar mExpected_1;
     private RatingBar mExpected_2;
@@ -40,7 +41,6 @@ public class TaskDetailsActivity extends Activity {
 	setTitle(getIntent().getStringExtra(EXTRA_TASK_CONTENT));
 	getWindow().setBackgroundDrawableResource(R.color.white);
 	final boolean taskIsDone = getIntent().getBooleanExtra(EXTRA_TASK_STATUS, false);
-	
 	
 	instantiateExpected(uri, taskIsDone);
 	
