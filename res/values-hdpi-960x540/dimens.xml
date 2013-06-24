@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="pomodoro_clock_view_width">300dip</dimen>
+</resources>
