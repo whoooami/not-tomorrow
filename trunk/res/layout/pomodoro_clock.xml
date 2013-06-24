@@ -16,8 +16,8 @@
     
     <com.hilton.todo.PomodoroClockView
         android:id="@+id/clock_view"
-        android:layout_height="300dip"
-        android:layout_width="300dip"
+        android:layout_height="@dimen/pomodoro_clock_view_width"
+        android:layout_width="@dimen/pomodoro_clock_view_width"
         android:layout_gravity="center_horizontal" />
     
     <TextView android:id="@+id/clock_status"
