@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginRight="5dip"
+    android:layout_marginLeft="5dip"
+    android:orientation="vertical" >
+    <TextView android:id="@+id/status_panel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dip"
+        android:layout_marginTop="5dip"
+        android:layout_marginRight="5dip"
+        android:textColor="@color/black"
+        android:textSize="18sp" />
+    <LinearLayout android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center"
+        android:gravity="center">
+	    <com.hilton.todo.PomodoroClockView
+	        android:id="@+id/clock_view"
+	        android:layout_height="@dimen/pomodoro_clock_view_width"
+	        android:layout_width="@dimen/pomodoro_clock_view_width"
+	        android:layout_gravity="center_vertical" />
+	    <LinearLayout android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:orientation="vertical"
+	        android:layout_gravity="center"
+	        android:layout_marginLeft="30dip"
+	        android:gravity="center">
+		    <TextView android:id="@+id/clock_status"
+		        android:layout_height="wrap_content"
+		        android:layout_width="wrap_content"
+		        android:layout_gravity="center_horizontal"
+		        android:gravity="center_horizontal"
+		        android:singleLine="true"
+		        android:textColor="@color/black"
+		        android:textSize="20sp" />
+		    
+		    <LinearLayout android:orientation="horizontal"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_marginTop="30dip"
+		        android:gravity="center_horizontal">
+		        <Button android:id="@+id/interrupt"
+		            android:layout_height="wrap_content"
+		            android:layout_width="wrap_content"
+		            android:text="@string/interrupt" />
+		        <Button android:id="@+id/cancel"
+		            android:layout_height="wrap_content"
+		            android:layout_width="wrap_content"
+		            android:text="@string/cancel" />
+		    </LinearLayout>
+	    </LinearLayout>
+    </LinearLayout>
+</LinearLayout>
