@@ -19,6 +19,13 @@ public class PomodoroClockView extends View {
     private Paint mWorkingPaint;
     private Paint mCountDownPaint;
     private float mSweepAngle;
+    private Paint mMarkerPaint;
+    private int mMarkerX;
+    private int mMarkerY;
+    private int mMarkerHeight;
+    private Paint mMarkerTextPaint;
+    private float mCenterX;
+    private float mCenterY;
     
     public PomodoroClockView(Context context) {
 	this(context, null);
@@ -46,6 +53,15 @@ public class PomodoroClockView extends View {
 	mCountDownPaint.setAlpha(200);
 	mCountDownPaint.setStyle(Style.FILL);
 	mSweepAngle = 0.0f;
+	
+	mMarkerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+	mMarkerPaint.setColor(Color.BLUE);
+	mMarkerPaint.setStyle(Style.STROKE);
+	mMarkerPaint.setStrokeWidth(2.0f);
+	
+	mMarkerTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+	mMarkerTextPaint.setColor(Color.BLUE);
+	mMarkerHeight = (int) context.getResources().getDimension(R.dimen.pomodoro_clock_marker_height);
     }
 
     @Override
@@ -63,6 +79,10 @@ public class PomodoroClockView extends View {
 	mWorkingArea.left = left;
 	mWorkingArea.bottom = top + 2 * mClockRadius;
 	mWorkingArea.right = left + 2 * mClockRadius;
+	mMarkerX = w / 2;
+	mMarkerY = (int) top;
+	mCenterX = mMarkerX;
+	mCenterY = h / 2;
 	Log.e(TAG, "onsize changed ");
     }
 
@@ -77,6 +97,33 @@ public class PomodoroClockView extends View {
 	canvas.drawArc(mWorkingArea, 210, 60, true, mRestPaint);
 	canvas.drawArc(mWorkingArea, 270, 300, true, mWorkingPaint);
 	canvas.drawArc(mWorkingArea, 270, mSweepAngle, true, mCountDownPaint);
+	canvas.drawLine(mMarkerX, mMarkerY, mMarkerX, mMarkerHeight + mMarkerY, mMarkerPaint);
+	canvas.drawText("0", mMarkerX - 3, mMarkerY - 5, mMarkerTextPaint);
+	canvas.save();
+	canvas.rotate(60, mCenterX, mCenterY);
+	canvas.drawLine(mMarkerX, mMarkerY, mMarkerX, mMarkerHeight + mMarkerY, mMarkerPaint);
+	canvas.drawText("5", mMarkerX - 3, mMarkerY - 5, mMarkerTextPaint);
+	canvas.save();
+	canvas.rotate(60, mCenterX, mCenterY);
+	canvas.drawLine(mMarkerX, mMarkerY, mMarkerX, mMarkerHeight + mMarkerY, mMarkerPaint);
+	canvas.drawText("10", mMarkerX - 5, mMarkerY - 5, mMarkerTextPaint);
+	canvas.save();
+	canvas.rotate(60, mCenterX, mCenterY);
+	canvas.drawLine(mMarkerX, mMarkerY, mMarkerX, mMarkerHeight + mMarkerY, mMarkerPaint);
+	canvas.drawText("15", mMarkerX - 7, mMarkerY - 5, mMarkerTextPaint);
+	canvas.save();
+	canvas.rotate(60, mCenterX, mCenterY);
+	canvas.drawLine(mMarkerX, mMarkerY, mMarkerX, mMarkerHeight + mMarkerY, mMarkerPaint);
+	canvas.drawText("20", mMarkerX - 5, mMarkerY - 5, mMarkerTextPaint);
+	canvas.save();
+	canvas.rotate(60, mCenterX, mCenterY);
+	canvas.drawLine(mMarkerX, mMarkerY, mMarkerX, mMarkerHeight + mMarkerY, mMarkerPaint);
+	canvas.drawText("25", mMarkerX - 5, mMarkerY - 5, mMarkerTextPaint);
+	canvas.restore();
+	canvas.restore();
+	canvas.restore();
+	canvas.restore();
+	canvas.restore();
 	super.onDraw(canvas);
 	mSweepAngle += 1.0f;
 	postInvalidateDelayed(5000, (int) mWorkingArea.left, (int) mWorkingArea.top, (int) mWorkingArea.right, (int) mWorkingArea.bottom);
