@@ -88,26 +88,19 @@ public class TaskDetailsActivity extends Activity {
 	mCursor.moveToFirst();
 	final RatingBar interrupts_1 = (RatingBar) findViewById(R.id.interrupts_1);
 	final RatingBar interrupts_2 = (RatingBar) findViewById(R.id.interrupts_2);
-	final RatingBar interrupts_3 = (RatingBar) findViewById(R.id.interrupts_3);
 	final int interruptsCount = mCursor.getInt(PomodoroIndex.INTERRUPTS);
 	if (interruptsCount <= 6) {
 	    interrupts_1.setRating(interruptsCount);
 	    interrupts_2.setVisibility(View.GONE);
 	    interrupts_2.setRating(0);
-	    interrupts_3.setVisibility(View.GONE);
-	    interrupts_3.setRating(0);
 	} else if (interruptsCount <= 12){
 	    interrupts_1.setRating(6);
 	    interrupts_2.setVisibility(View.VISIBLE);
 	    interrupts_2.setRating(interruptsCount - 6);
-	    interrupts_3.setVisibility(View.GONE);
-	    interrupts_3.setRating(0);
 	} else {
 	    interrupts_1.setRating(6);
 	    interrupts_2.setVisibility(View.VISIBLE);
 	    interrupts_2.setRating(interruptsCount - 6);
-	    interrupts_3.setVisibility(View.VISIBLE);
-	    interrupts_3.setRating(interruptsCount - 12);
 	}
     }
 
