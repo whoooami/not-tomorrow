@@ -34,7 +34,7 @@
     </style>
     <style name="pomodoro_ratingbar" parent="@android:style/Widget.RatingBar">
         <item name="android:progressDrawable">@drawable/pomodoro_ratingbar</item>
-        <item name="android:minHeight">48dip</item>
-        <item name="android:maxHeight">48dip</item>
+        <item name="android:minHeight">@dimen/ratingstar_min_height</item>
+        <item name="android:maxHeight">@dimen/ratingstar_max_height</item>
     </style>
 </resources>
