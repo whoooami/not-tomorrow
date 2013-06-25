@@ -5,4 +5,5 @@
     <dimen name="task_details_spacing">20dip</dimen>
     <dimen name="ratingstar_min_height">56dip</dimen>
     <dimen name="ratingstar_max_height">56dip</dimen>
+    <dimen name="pomodoro_clock_spacing">60dip</dimen>
 </resources>
