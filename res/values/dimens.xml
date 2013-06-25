@@ -2,4 +2,5 @@
 <resources>
     <dimen name="pomodoro_clock_view_width">240dip</dimen>
     <dimen name="pomodoro_clock_marker_height">5dip</dimen>
+    <dimen name="task_details_spacing">10dip</dimen>
 </resources>
