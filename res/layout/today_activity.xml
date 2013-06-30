@@ -13,9 +13,6 @@
         style="@style/header_text"
         android:layout_marginLeft="5dip"
         android:layout_gravity="left" />
-    <TextView android:layout_width="fill_parent"
-        android:layout_height="1dip"
-        android:background="@drawable/line" />
     <com.hilton.todo.TodayTaskListView
         android:id="@+id/task_list"
         android:layout_width="fill_parent"
