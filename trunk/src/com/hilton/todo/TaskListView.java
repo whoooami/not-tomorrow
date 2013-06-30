@@ -20,10 +20,6 @@ public class TaskListView extends ListView {
     
     @Override
     public void onDraw(Canvas paramCanvas) {
-	Paint divider = new Paint();
-	divider.setColor(getContext().getResources().getColor(R.color.divider));
-	divider.setStyle(Paint.Style.STROKE);
-	paramCanvas.drawLine(0.0F, 0.0F, getWidth(), 0.0F, divider);
 	final int itemHeight = (int) getContext().getResources().getDimension(R.dimen.list_view_empty_item_height);
 	int bottom = 0;
 	if (getChildCount() > 0) {
@@ -34,7 +30,7 @@ public class TaskListView extends ListView {
 	    if (bottom > height) {
 		return;
 	    }
-	    divider = new Paint();
+	    Paint divider = new Paint();
 	    divider.setColor(getContext().getResources().getColor(R.color.divider));
 	    divider.setStyle(Paint.Style.STROKE);
 	    float depth = bottom + itemHeight;
