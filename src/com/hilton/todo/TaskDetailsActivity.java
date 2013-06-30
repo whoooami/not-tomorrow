@@ -4,8 +4,13 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.StrikethroughSpan;
+import android.text.style.StyleSpan;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RatingBar;
@@ -39,7 +44,6 @@ public class TaskDetailsActivity extends Activity {
 	setContentView(R.layout.task_details);
 	getWindow().setBackgroundDrawableResource(R.drawable.pomodoro_background);
 	final Uri uri = getIntent().getData();
-	setTitle(getIntent().getStringExtra(EXTRA_TASK_CONTENT));
 	final boolean taskIsDone = getIntent().getBooleanExtra(EXTRA_TASK_STATUS, false);
 	
 	instantiateExpected(uri, taskIsDone);
@@ -79,9 +83,17 @@ public class TaskDetailsActivity extends Activity {
 	startPomodoro.setEnabled(!taskIsDone);
 	
 	final TextView statusPanel = (TextView) findViewById(R.id.status_panel);
-	statusPanel.setText(taskIsDone ? 
-		getString(R.string.task_tip_completed).replaceAll("#", String.valueOf(mSpentPomodoros*0.5f)) : 
-		getString(R.string.task_tip_unfinished));
+	final String taskContent = getIntent().getStringExtra(EXTRA_TASK_CONTENT);
+	statusPanel.setText(taskContent);
+	if (taskIsDone) {
+	    final Spannable style = new SpannableString(taskContent);
+	    style.setSpan(new StrikethroughSpan(), 0, taskContent.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+	    style.setSpan(new StyleSpan(Typeface.ITALIC) , 0, taskContent.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+	    statusPanel.setText(style);
+	    statusPanel.setTextAppearance(this, R.style.done_task_item_text);
+	} else {
+	    statusPanel.setTextAppearance(this, R.style.task_item_text);
+	}
     }
 
     private void setInterrupts() {

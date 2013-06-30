@@ -13,8 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:singleLine="true"
-        android:textSize="18sp"
-        style="@style/task_text"/>
+        android:textSize="18sp"/>
     
     <TextView android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -84,7 +83,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        style="@style/pomodoro_ratingbar"
+        style="@style/interrupt_ratingbar"
         android:isIndicator="true"
         android:numStars="6"
         android:rating="0"
@@ -93,7 +92,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        style="@style/pomodoro_ratingbar"
+        style="@style/interrupt_ratingbar"
         android:isIndicator="true"
         android:numStars="6"
         android:rating="0"
