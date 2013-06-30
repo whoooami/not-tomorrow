@@ -37,4 +37,11 @@
         <item name="android:minHeight">@dimen/ratingstar_min_height</item>
         <item name="android:maxHeight">@dimen/ratingstar_max_height</item>
     </style>
+    <style name="pomodoro_button" parent="@android:style/Widget.Button">
+        <item name="android:background">@drawable/button_background</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingLeft">15dip</item>
+        <item name="android:paddingRight">15dip</item>
+        <item name="android:textSize">16sp</item>
+    </style>
 </resources>

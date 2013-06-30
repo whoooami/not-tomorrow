@@ -48,7 +48,7 @@ public class PomodoroClockActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
 	super.onCreate(savedInstanceState);
 	setContentView(R.layout.pomodoro_clock);
-	getWindow().setBackgroundDrawableResource(R.color.white);
+	getWindow().setBackgroundDrawableResource(R.drawable.pomodoro_background);
 	bindToService();
 	final Uri uri = getIntent().getData();
 	

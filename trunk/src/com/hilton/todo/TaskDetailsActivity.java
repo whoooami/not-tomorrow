@@ -37,9 +37,9 @@ public class TaskDetailsActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
 	super.onCreate(savedInstanceState);
 	setContentView(R.layout.task_details);
+	getWindow().setBackgroundDrawableResource(R.drawable.pomodoro_background);
 	final Uri uri = getIntent().getData();
 	setTitle(getIntent().getStringExtra(EXTRA_TASK_CONTENT));
-	getWindow().setBackgroundDrawableResource(R.color.white);
 	final boolean taskIsDone = getIntent().getBooleanExtra(EXTRA_TASK_STATUS, false);
 	
 	instantiateExpected(uri, taskIsDone);

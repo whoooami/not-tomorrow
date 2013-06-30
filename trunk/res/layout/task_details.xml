@@ -71,6 +71,7 @@
         android:layout_width="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="@dimen/task_details_spacing"
+        style="@style/pomodoro_button"
         android:text="@string/start_pomodoro"/>
     
     <TextView android:layout_width="wrap_content"
