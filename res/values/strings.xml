@@ -20,7 +20,7 @@
         <item>1 month</item>
     </string-array>
     <string name="move_to_today">Move to today</string>
-    <string name="goto_tomorrow">Tomorrow</string>
+    <string name="goto_tomorrow">Tomorrow list</string>
     <string name="view_history">View history</string>
     <string name="move_to_today_tip">\"#\" is moved to today.</string>
     <string name="move_to_tomorrow_tip">\"#\" is moved to tomorrow.</string>
