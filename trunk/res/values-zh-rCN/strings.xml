@@ -38,10 +38,10 @@
     <string name="pomodoro_start">"开启一个蕃茄时钟."</string>
     <string name="noti_work_time">"现在是工作时间!"</string>
     <string name="noti_rest_time">"好好的休息一下吧!"</string>
-    <string name="pomodoro_expected">"预估的蕃茄数:"</string>
-    <string name="pomodoro_spent">实际花费的蕃茄数:</string>
-    <string name="start_pomodoro">开始一个蕃茄</string>
+    <string name="pomodoro_expected">"预估的番茄数:"</string>
+    <string name="pomodoro_spent">实际花费的番茄数:</string>
+    <string name="start_pomodoro">开始一个番茄</string>
     <string name="interrupts">被打断的次数:</string>
     <string name="interrupt">被打断</string>
-        <string name="pomodoro_clock">蕃茄时钟</string>
+    <string name="pomodoro_clock">番茄时钟</string>
 </resources>
