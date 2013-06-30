@@ -39,6 +39,7 @@
         </activity>
         <activity android:name="com.hilton.todo.TaskDetailsActivity"
                 android:configChanges="keyboard|keyboardHidden"
+                android:theme="@android:style/Theme.NoTitleBar"
                 android:label="Task details">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -46,6 +47,7 @@
         </activity>
         <activity android:name="PomodoroClockActivity"
                 android:configChanges="keyboard|keyboardHidden"
+                android:theme="@android:style/Theme.NoTitleBar"
                 android:launchMode="singleTask"
                 android:label="Pomodoro Clock">
             <intent-filter>
