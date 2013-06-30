@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android" >
      <item android:state_pressed="true"
-           android:drawable="@drawable/button_background_pressed" /> <!-- pressed -->
+           android:drawable="@drawable/button_background_pressed"
+           android:state_enabled="true" />
      <item android:state_focused="true"
-           android:drawable="@drawable/button_background_pressed" /> <!-- focused -->
-     <item android:drawable="@drawable/button_background_normal" /> <!-- default -->
+           android:drawable="@drawable/button_background_pressed"
+           android:state_enabled="true" />
+     <item android:drawable="@drawable/button_background_normal" 
+         android:state_enabled="true"/>
+     <item android:drawable="@drawable/button_background_disabled"
+         android:state_enabled="false" />
 </selector>
