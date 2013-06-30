@@ -28,14 +28,12 @@
     <string name="reorder">重新调整顺序</string>
     <string name="description_missing">请输入任务描述.</string>
     <string name="sync_with_google">与Google任务同步</string>
-    <string name="task_tip_unfinished">任务未完成,需要行动.</string>
-    <string name="task_tip_completed">任务已完成,共花费了#小时.</string>
     <string name="task_tip_complicated">任务太复杂了,需要分解.</string>
-    <string name="pomodoro_order">任务\"@\"的第$个蕃茄</string>
+    <string name="pomodoro_order">任务\"@\"的第$个番茄</string>
     <string name="work_time">工作时间:   -</string>
     <string name="rest_time">休息时间:  -</string>
-    <string name="pomodoro_finished">蕃茄时钟已经完成."</string>
-    <string name="pomodoro_start">"开启一个蕃茄时钟."</string>
+    <string name="pomodoro_finished">番茄时钟已经完成."</string>
+    <string name="pomodoro_start">"开启一个番茄时钟."</string>
     <string name="noti_work_time">"现在是工作时间!"</string>
     <string name="noti_rest_time">"好好的休息一下吧!"</string>
     <string name="pomodoro_expected">"预估的番茄数:"</string>
