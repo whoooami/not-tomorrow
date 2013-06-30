@@ -4,4 +4,5 @@
     <dimen name="pomodoro_clock_marker_height">5dip</dimen>
     <dimen name="ratingstar_min_height">48dip</dimen>
     <dimen name="ratingstar_max_height">48dip</dimen>
+    <dimen name="list_view_empty_item_height">38dip</dimen>
 </resources>
