@@ -31,8 +31,6 @@
     <string name="reorder">Reorder</string>
     <string name="description_missing">Please enter task description.</string>
     <string name="sync_with_google">Sync with Google Tasks</string>
-    <string name="task_tip_unfinished">Unfinished, needs action.</string>
-    <string name="task_tip_completed">Task is completed and takes # hours.</string>
     <string name="task_tip_complicated">Task is too complex, divid it.</string>
     <string name="pomodoro_order">Pomodoro #$ of task \"@\"</string>
     <string name="work_time">Work time:   -</string>
