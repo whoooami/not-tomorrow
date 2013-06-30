@@ -24,7 +24,7 @@ public class TaskListView extends ListView {
 	divider.setColor(getContext().getResources().getColor(R.color.divider));
 	divider.setStyle(Paint.Style.STROKE);
 	paramCanvas.drawLine(0.0F, 0.0F, getWidth(), 0.0F, divider);
-	final int itemHeight = (int) (50.0F * getContext().getResources().getDisplayMetrics().density);
+	final int itemHeight = (int) getContext().getResources().getDimension(R.dimen.list_view_empty_item_height);
 	int bottom = 0;
 	if (getChildCount() > 0) {
 	    bottom = getChildAt(getChildCount() - 1).getBottom();

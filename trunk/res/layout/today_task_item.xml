@@ -8,8 +8,8 @@
   android:gravity="center">
     <CheckBox
         android:id="@+id/action_toggle_done"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="36dip"
+        android:layout_height="36dip"
         android:layout_gravity="center"
 	    android:focusable="false"
         android:button="@drawable/ic_checkbox"
@@ -18,19 +18,19 @@
 	<TextView android:id="@+id/task"
            style="@style/task_item_text" />
 	<ImageView android:id="@+id/pomodoro_card"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
+	    android:layout_width="36dip"
+	    android:layout_height="36dip"
 	    android:contentDescription="Goto Pomodoro card"
 	    android:visibility="visible"
-	    android:src="@drawable/ic_delete_normal"/>
+	    android:src="@drawable/ic_details"/>
 	
 	<ImageView android:id="@+id/dragger"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="36dip"
+        android:layout_height="36dip"
         android:contentDescription="dragging"
         android:scaleType="center"
         android:layout_gravity="center"
         android:gravity="center"
         android:visibility="gone"
-        android:src="@drawable/ic_push"/>
+        android:src="@drawable/ic_reorder"/>
 </LinearLayout>
