@@ -2,12 +2,12 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android" >
     <item android:state_pressed="true"
         android:state_window_focused="true"
-        android:drawable="@drawable/ic_pomodoro_empty_pressed"/>
+        android:drawable="@drawable/ic_interrupt_empty"/>
     <item android:state_focused="true"
         android:state_window_focused="true"
-        android:drawable="@drawable/ic_pomodoro_empty_pressed"/>
+        android:drawable="@drawable/ic_interrupt_empty"/>
     <item android:state_selected="true"
         android:state_window_focused="true"
-        android:drawable="@drawable/ic_pomodoro_empty_pressed"/>
-    <item android:drawable="@drawable/ic_pomodoro_empty_normal" />
+        android:drawable="@drawable/ic_interrupt_empty"/>
+    <item android:drawable="@drawable/ic_interrupt_empty" />
 </selector>
