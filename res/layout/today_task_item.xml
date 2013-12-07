@@ -4,33 +4,36 @@
   android:orientation="horizontal"
   android:layout_width="fill_parent"
   android:layout_height="wrap_content"
-  android:layout_gravity="center"
-  android:gravity="center">
+  android:gravity="center_vertical">
     <CheckBox
         android:id="@+id/action_toggle_done"
         android:layout_width="36dip"
         android:layout_height="36dip"
-        android:layout_gravity="center"
+        android:layout_weight="0"
+        android:layout_gravity="center_vertical"
 	    android:focusable="false"
         android:button="@drawable/ic_checkbox"
-        android:gravity="center" />
-
+        android:gravity="center_vertical" />
 	<TextView android:id="@+id/task"
+           android:layout_width="match_parent"
+           android:layout_weight="1"
+           android:layout_height="wrap_content"
            style="@style/task_item_text" />
 	<ImageView android:id="@+id/pomodoro_card"
 	    android:layout_width="36dip"
 	    android:layout_height="36dip"
+	    android:layout_weight="0"
 	    android:contentDescription="Goto Pomodoro card"
 	    android:visibility="visible"
 	    android:src="@drawable/ic_details"/>
 	
-	<ImageView android:id="@+id/dragger"
+	<ImageView android:id="@id/drag_handle"
         android:layout_width="36dip"
         android:layout_height="36dip"
         android:contentDescription="dragging"
         android:scaleType="center"
-        android:layout_gravity="center"
-        android:gravity="center"
+        android:layout_gravity="center_vertical"
+        android:gravity="center_vertical"
         android:visibility="gone"
         android:src="@drawable/ic_reorder"/>
 </LinearLayout>

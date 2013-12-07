@@ -77,7 +77,7 @@ public class TodayTaskListView extends TaskListView {
 	mDragPoint = y - itemView.getTop();
 	mDragOffset = (int) (ev.getRawY() - y);
 
-	final View dragger = itemView.findViewById(R.id.dragger);
+	final View dragger = itemView.findViewById(R.id.drag_handle);
 	if (dragger != null && x > dragger.getLeft() - 20) {
 	    mScrollUpBound = Math.min(y-mTouchSlop, getHeight()/3);
 	    mScrollDownBound = Math.max(y+mTouchSlop, getHeight()*2/3);

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/container"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="@drawable/background"
@@ -14,18 +13,12 @@
         style="@style/header_text"
         android:layout_marginLeft="5dip"
         android:layout_gravity="left" />
-    <com.hilton.todo.DragAndSortTaskListView
-        xmlns:dslv="http://schemas.android.com/apk/res/com.hilton.todo"
+    <com.hilton.todo.TodayTaskListView
         android:id="@+id/task_list"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_margin="10dp"
         android:divider="@color/divider"
         android:dividerHeight="0.6dip"
         android:footerDividersEnabled="true"
-        android:headerDividersEnabled="true"
-        android:cacheColorHint="#ffffff"
-        dslv:drag_enabled="true"
-        dslv:drag_handle_id="@id/drag_handle" />
-
+        android:headerDividersEnabled="true" />
 </LinearLayout>
