@@ -37,6 +37,7 @@ import android.view.View;
 import android.view.View.OnKeyListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.view.WindowManager.LayoutParams;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.CheckBox;
@@ -45,6 +46,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.CursorAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,7 +60,7 @@ import com.google.api.services.tasks.Tasks;
 import com.google.api.services.tasks.TasksScopes;
 import com.hilton.todo.TaskStore.ProjectionIndex;
 import com.hilton.todo.TaskStore.TaskColumns;
-import com.hilton.todo.TodayTaskListView.DropListener;
+import com.mobeta.android.dslv.DragSortListView.DropListener;
 
 public class TodayActivity extends Activity {
     protected static final String TAG = "TodayActivity";
@@ -71,7 +73,7 @@ public class TodayActivity extends Activity {
     static final int REQUEST_CODE_AUTHORIZATION = 102;
     private static final String PREF_ACCOUNT_NAME = "accountName";
     
-    private TodayTaskListView mTaskList;
+    private DragAndSortTaskListView mTaskList;
     private EditText mAddTaskEditor;
     private LayoutInflater mFactory;
     private GestureDetector mGestureDetector;
@@ -83,6 +85,9 @@ public class TodayActivity extends Activity {
     private GoogleAccountCredential mCredential;
     private com.google.api.services.tasks.Tasks mTaskService;
     
+    private boolean mReorderingMode;
+    private TaskAdapter mTaskAdapter;
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,8 +97,9 @@ public class TodayActivity extends Activity {
         header.setText(getString(R.string.today).replace("#", new SimpleDateFormat(getString(R.string.date_format)).format(date.getTime())));
         
         mFactory = LayoutInflater.from(getApplication());
-        mTaskList = (TodayTaskListView) findViewById(R.id.task_list);
-        mTaskList.exitDraggingMode();
+        mTaskList = (DragAndSortTaskListView) findViewById(R.id.task_list);
+        mTaskList.setDragEnabled(false);
+        mReorderingMode = false;
         final View headerView = mFactory.inflate(R.layout.header_view, null);
         mTaskList.addHeaderView(headerView);
         mAddTaskEditor = (EditText) headerView.findViewById(R.id.task_editor);
@@ -117,51 +123,49 @@ public class TodayActivity extends Activity {
             }
         });
         final Cursor cursor = TaskStore.getTodayTasks(getContentResolver());
-        final TaskAdapter adapter = new TaskAdapter(getApplication(), cursor);
-        mTaskList.setAdapter(adapter);
+        mTaskAdapter = new TaskAdapter(getApplication(), cursor);
+        mTaskList.setAdapter(mTaskAdapter);
         mSwitchGestureListener = new SwitchGestureListener();
         mGestureDetector = new GestureDetector(mSwitchGestureListener);
-        mTaskList.setOnTouchListener(new OnTouchListener() {
-	    @Override
-	    public boolean onTouch(View v, MotionEvent event) {
-		return mGestureDetector.onTouchEvent(event);
-	    }
-	});
+        mTaskList.setGestureDetector(mGestureDetector);
         registerForContextMenu(mTaskList);
         mTaskList.setDropListener(new DropListener() {
 	    @Override
 	    public void drop(int from, int to) {
-		    /*
-		     * Why data won't change before?
-		     * You see cursors return by #getItemAtPosition are the same cursor with positioning on different rows.
-		     * So, the cursors should be one the same row positioned by last call to #getItemAtPosition.
-		     *    Cursor c1 = #getItemAtPosition(0); // cursor.moveToPosition(0);
-		     *    // get data from c1
-		     *    Cursor c2 = #getItemAtPosition(2); // cursor.moveToPosition(2);
-		     *    // get data from c2
-		     *    Cursor c3 = #getItemAtPosition(4); // cursor.moveToPosition(4);
-		     *    // get data from c4
-		     *    
-		     *    now c1, c2 and c3 are all positioned at 4.
-		     *    So if you want to retrieve data on different row, you should get data after each #getItemAtPosition.
-		     */
-		    // swap modified time of mDragPosition and mDragSrcPosition
-		    final Cursor src = (Cursor) mTaskList.getItemAtPosition(from);
-		    android.database.DatabaseUtils.dumpCurrentRow(src);
-		    long srcModified = src.getLong(ProjectionIndex.CREATED);
-		    final Uri srcUri = ContentUris.withAppendedId(TaskStore.CONTENT_URI, src.getLong(ProjectionIndex.ID));
+	        /*
+	         * Why data won't change before?
+	         * You see cursors return by #getItemAtPosition are the same cursor with positioning on different rows.
+	         * So, the cursors should be one the same row positioned by last call to #getItemAtPosition.
+	         *    Cursor c1 = #getItemAtPosition(0); // cursor.moveToPosition(0);
+	         *    // get data from c1
+	         *    Cursor c2 = #getItemAtPosition(2); // cursor.moveToPosition(2);
+	         *    // get data from c2
+	         *    Cursor c3 = #getItemAtPosition(4); // cursor.moveToPosition(4);
+	         *    // get data from c4
+	         *    
+	         *    now c1, c2 and c3 are all positioned at 4.
+	         *    So if you want to retrieve data on different row, you should get data after each #getItemAtPosition.
+	         */
+	        // swap modified time of mDragPosition and mDragSrcPosition
+	        // Attention: mTaskList.getItemAtPosition() is not correct because of header view. Position passed from
+	        // DragSortList already take header view into account. While getItemAtPosition() will take care of
+	        // header view too, so the actual item returned from getItemAtPosition is one ahead of expected one.
+	        final Cursor src = (Cursor) mTaskAdapter.getItem(from);
+	        android.database.DatabaseUtils.dumpCurrentRow(src);
+	        long srcModified = src.getLong(ProjectionIndex.CREATED);
+	        final Uri srcUri = ContentUris.withAppendedId(TaskStore.CONTENT_URI, src.getLong(ProjectionIndex.ID));
 
-		    final Cursor dst = (Cursor) mTaskList.getItemAtPosition(to);
-		    android.database.DatabaseUtils.dumpCurrentRow(dst);
-		    long dstModified = dst.getLong(ProjectionIndex.CREATED);
-		    final Uri dstUri = ContentUris.withAppendedId(TaskStore.CONTENT_URI, dst.getLong(ProjectionIndex.ID));
-		    
-		    final ContentValues values = new ContentValues(1);
-		    values.put(TaskColumns.CREATED, dstModified);
-		    getContentResolver().update(srcUri, values, null, null);
-		    values.clear();
-		    values.put(TaskColumns.CREATED, srcModified);
-		    getContentResolver().update(dstUri, values, null, null);
+	        final Cursor dst = (Cursor) mTaskAdapter.getItem(to);
+	        android.database.DatabaseUtils.dumpCurrentRow(dst);
+	        long dstModified = dst.getLong(ProjectionIndex.CREATED);
+	        final Uri dstUri = ContentUris.withAppendedId(TaskStore.CONTENT_URI, dst.getLong(ProjectionIndex.ID));
+
+	        final ContentValues values = new ContentValues(1);
+	        values.put(TaskColumns.CREATED, dstModified);
+	        getContentResolver().update(srcUri, values, null, null);
+	        values.clear();
+	        values.put(TaskColumns.CREATED, srcModified);
+	        getContentResolver().update(dstUri, values, null, null);
 	    }
         });
         mConnectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -211,7 +215,7 @@ public class TodayActivity extends Activity {
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-	if (mTaskList.inDraggingMode()) {
+	if (mReorderingMode) {
 	    return;
 	}
 	final long id = ((AdapterContextMenuInfo) menuInfo).id;
@@ -230,8 +234,11 @@ public class TodayActivity extends Activity {
     public void onResume() {
 	super.onResume();
 	mSwitchGestureListener.reset();
-	if (mTaskList.inDraggingMode()) {
-	    mTaskList.exitDraggingMode();
+	if (mReorderingMode) {
+	    // TODO: refresh the list(invalidate the list view)
+	    mReorderingMode = false;
+	    mTaskList.setDragEnabled(false);
+	    mTaskAdapter.notifyDataSetChanged();
 	}
     }
     
@@ -245,8 +252,10 @@ public class TodayActivity extends Activity {
 	switch (keyCode) {
 	case KeyEvent.KEYCODE_BACK:
 	case KeyEvent.KEYCODE_MENU:
-	    if (mTaskList.inDraggingMode()) {
-		mTaskList.exitDraggingMode();
+	    if (mReorderingMode) {
+	        mReorderingMode = false;
+		mTaskList.setDragEnabled(false);
+		mTaskAdapter.notifyDataSetChanged();
 		return true;
 	    }
 	}
@@ -281,7 +290,9 @@ public class TodayActivity extends Activity {
 	    overridePendingTransition(R.anim.activity_enter_in, R.anim.activity_enter_out);
 	    break;
 	case REORDER:
-	    mTaskList.enterDragingMode();
+	    mReorderingMode = true;
+	    mTaskList.setDragEnabled(true);
+	    mTaskAdapter.notifyDataSetChanged();
 	    break;
 	case SYNC_GOOGLE_TASK: {
 	    NetworkInfo info = mConnectivityManager.getActiveNetworkInfo();
@@ -318,7 +329,7 @@ public class TodayActivity extends Activity {
 	}
 	if (mTaskService == null) {
 	    mTaskService = new Tasks.Builder(transport, jsonFactory, mCredential)
-	    		.setApplicationName("NotTomorrow").build();
+	    		.setApplicationName(getString(R.string.app_name)).build();
 	}
 	SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
 	mCredential.setSelectedAccountName(settings.getString(PREF_ACCOUNT_NAME, null));
@@ -390,6 +401,8 @@ public class TodayActivity extends Activity {
         public void bindView(View view, Context context, Cursor cursor) {
             if (view  == null) {
                 view = mFactory.inflate(R.layout.today_task_item, null);
+                view.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT));
             }
             /*
              * Everytime bindView is called from a ListView, the views are not coming in the same order before bindView()
@@ -418,7 +431,7 @@ public class TodayActivity extends Activity {
              */
             toggle.setOnCheckedChangeListener(null);
             toggle.setChecked(done != 0);
-            toggle.setOnCheckedChangeListener(mTaskList.inDraggingMode() ? null : new OnCheckedChangeListener() {
+            toggle.setOnCheckedChangeListener(mReorderingMode ? null : new OnCheckedChangeListener() {
         	@Override
         	public void onCheckedChanged(CompoundButton view, boolean checked) {
         	    final ContentValues values = new ContentValues(1);
@@ -428,8 +441,8 @@ public class TodayActivity extends Activity {
         	}
 
             });
-            toggle.setVisibility(mTaskList.inDraggingMode() ? View.GONE : View.VISIBLE);
-            view.setOnTouchListener(mTaskList.inDraggingMode() ? null : new OnTouchListener() {
+            toggle.setVisibility(mReorderingMode ? View.GONE : View.VISIBLE);
+            view.setOnTouchListener(mReorderingMode ? null : new OnTouchListener() {
 	        @Override
 	        public boolean onTouch(View v, MotionEvent event) {
 	            return mGestureDetector.onTouchEvent(event);
@@ -448,10 +461,10 @@ public class TodayActivity extends Activity {
         	task.setTextAppearance(getApplication(), R.style.task_item_text);
             }
             
-            ImageView dragger = (ImageView) view.findViewById(R.id.dragger);
-            dragger.setVisibility(mTaskList.inDraggingMode() ? View.VISIBLE : View.GONE);
+            ImageView dragger = (ImageView) view.findViewById(R.id.drag_handle);
+            dragger.setVisibility(mReorderingMode ? View.VISIBLE : View.GONE);
             ImageView pomodoro = (ImageView) view.findViewById(R.id.pomodoro_card);
-            pomodoro.setVisibility(mTaskList.inDraggingMode() ? View.GONE : View.VISIBLE);
+            pomodoro.setVisibility(mReorderingMode ? View.GONE : View.VISIBLE);
             pomodoro.setOnClickListener(new View.OnClickListener() {
 	        @Override
 	        public void onClick(View v) {
@@ -468,6 +481,8 @@ public class TodayActivity extends Activity {
         @Override
         public View newView(Context context, Cursor cursor, ViewGroup parent) {
             View view = mFactory.inflate(R.layout.today_task_item, null);
+            view.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT));
             return view;
         }
     }

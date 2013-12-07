@@ -12,15 +12,10 @@
         <item name="android:textSize">24sp</item>
     </style>
     <style name="task_item_text" parent="task_text">
-        <item name="android:layout_width">0dip</item>
-        <item name="android:layout_weight">1</item>
-        <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@color/black</item>
         <item name="android:textSize">18sp</item>
     </style>
     <style name="done_task_item_text" parent="task_text">
-        <item name="android:layout_width">fill_parent</item>
-        <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@color/task_done</item>
         <item name="android:singleLine">false</item>
         <item name="android:lines">2</item>

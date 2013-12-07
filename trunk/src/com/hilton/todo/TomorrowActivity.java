@@ -50,7 +50,7 @@ public class TomorrowActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.today_activity);
+        setContentView(R.layout.tomorrow_activity);
         final TextView header = (TextView) findViewById(R.id.header);
         final Calendar date = new GregorianCalendar();
         date.add(Calendar.DAY_OF_YEAR, 1);

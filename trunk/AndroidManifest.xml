@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="com.hilton.todo"
-      android:versionCode="2"
-      android:versionName="2.0">
+      android:versionCode="3"
+      android:versionName="3.0">
     <uses-sdk android:minSdkVersion="9" android:targetSdkVersion="9"/>
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -58,5 +58,13 @@
             android:authorities="com.hilton.todo.TaskProvider" />
         <service android:name="TaskRecyclerService" android:exported="false" />
         <service android:name="PomodoroClockService" android:exported="false" />
+        <activity android:name="DragAndSortTester"
+                android:configChanges="keyboard|keyboardHidden"
+                android:theme="@android:style/Theme.NoTitleBar"
+                android:label="Test drag and sort">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
     </application>
 </manifest>
