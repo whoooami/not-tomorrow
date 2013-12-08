@@ -11,6 +11,8 @@
     <com.hilton.todo.VerticalTextView
         android:id="@+id/header"
         android:layout_height="fill_parent"
+        android:layout_marginLeft="5dp"
+        android:layout_marginBottom="10dp"
         android:layout_width="30dip"
         android:textSize="22sp"
         android:paddingBottom="5dip"
@@ -21,6 +23,7 @@
         android:id="@+id/task_list"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:layout_marginRight="5dp"
         android:layout_marginLeft="5dip"
         android:divider="@color/divider"
         android:dividerHeight="0.6dip"
