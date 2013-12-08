@@ -224,9 +224,11 @@ public class TodayActivity extends Activity {
             return;
         }
         
-        final ArrayList<Long> modifieds = new ArrayList<Long>();
         final Cursor cursor = mTaskAdapter.getCursor();
-        cursor.moveToFirst();
+        if (!cursor.moveToFirst()) {
+            return;
+        }
+        final ArrayList<Long> modifieds = new ArrayList<Long>();
         do {
             modifieds.add(cursor.getLong(ProjectionIndex.CREATED));
         } while (cursor.moveToNext());
@@ -269,8 +271,16 @@ public class TodayActivity extends Activity {
     
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
+        hideSoftKeyboard();
 	menu.findItem(REORDER).setVisible(mTaskList.getChildCount()> 1);
 	return super.onPrepareOptionsMenu(menu);
+    }
+
+    private void hideSoftKeyboard() {
+        // hide the soft keyboard if showing
+        InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
     @Override
