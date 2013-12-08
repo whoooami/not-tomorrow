@@ -46,6 +46,7 @@ public class TomorrowActivity extends Activity {
     private LayoutInflater mFactory;
     private GestureDetector mGestureDetector;
     protected AlertDialog mDialogEditTask;
+    private TaskAdapter mTaskAdapter;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -88,8 +89,8 @@ public class TomorrowActivity extends Activity {
             }
         });
         final Cursor cursor = TaskStore.getTomorrowTasks(getContentResolver());
-        final TaskAdapter adapter = new TaskAdapter(getApplication(), cursor);
-        mTaskList.setAdapter(adapter);
+        mTaskAdapter = new TaskAdapter(getApplication(), cursor);
+        mTaskList.setAdapter(mTaskAdapter);
         mGestureDetector = new GestureDetector(new SwitchGestureListener());
         mTaskList.setOnTouchListener(new OnTouchListener() {
 	    @Override
@@ -104,6 +105,10 @@ public class TomorrowActivity extends Activity {
     public void onDestroy() {
 	super.onDestroy();
 	unregisterForContextMenu(mTaskList);
+	if (mTaskAdapter == null) {
+	    return;
+	}
+	mTaskAdapter.getCursor().close();
     }
     
     @Override
