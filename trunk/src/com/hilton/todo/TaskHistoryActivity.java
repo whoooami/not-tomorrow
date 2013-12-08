@@ -68,6 +68,12 @@ public class TaskHistoryActivity extends ExpandableListActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mAdapter.mCursor.close();
+    }
+
+    @Override
     public void onBackPressed() {
 	super.onBackPressed();
 	overridePendingTransition(R.anim.activity_leave_in, R.anim.activity_leave_out);

@@ -1,6 +1,7 @@
 package com.hilton.todo;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -37,13 +38,11 @@ import android.view.View;
 import android.view.View.OnKeyListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
-import android.view.WindowManager.LayoutParams;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.CursorAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -60,7 +59,7 @@ import com.google.api.services.tasks.Tasks;
 import com.google.api.services.tasks.TasksScopes;
 import com.hilton.todo.TaskStore.ProjectionIndex;
 import com.hilton.todo.TaskStore.TaskColumns;
-import com.mobeta.android.dslv.DragSortListView.DropListener;
+import com.mobeta.android.dslv.DragSortCursorAdapter;
 
 public class TodayActivity extends Activity {
     protected static final String TAG = "TodayActivity";
@@ -122,52 +121,13 @@ public class TodayActivity extends Activity {
         	return false;
             }
         });
-        final Cursor cursor = TaskStore.getTodayTasks(getContentResolver());
-        mTaskAdapter = new TaskAdapter(getApplication(), cursor);
+        
+        mTaskAdapter = new TaskAdapter(getApplication(), null);
         mTaskList.setAdapter(mTaskAdapter);
         mSwitchGestureListener = new SwitchGestureListener();
         mGestureDetector = new GestureDetector(mSwitchGestureListener);
         mTaskList.setGestureDetector(mGestureDetector);
         registerForContextMenu(mTaskList);
-        mTaskList.setDropListener(new DropListener() {
-	    @Override
-	    public void drop(int from, int to) {
-	        /*
-	         * Why data won't change before?
-	         * You see cursors return by #getItemAtPosition are the same cursor with positioning on different rows.
-	         * So, the cursors should be one the same row positioned by last call to #getItemAtPosition.
-	         *    Cursor c1 = #getItemAtPosition(0); // cursor.moveToPosition(0);
-	         *    // get data from c1
-	         *    Cursor c2 = #getItemAtPosition(2); // cursor.moveToPosition(2);
-	         *    // get data from c2
-	         *    Cursor c3 = #getItemAtPosition(4); // cursor.moveToPosition(4);
-	         *    // get data from c4
-	         *    
-	         *    now c1, c2 and c3 are all positioned at 4.
-	         *    So if you want to retrieve data on different row, you should get data after each #getItemAtPosition.
-	         */
-	        // swap modified time of mDragPosition and mDragSrcPosition
-	        // Attention: mTaskList.getItemAtPosition() is not correct because of header view. Position passed from
-	        // DragSortList already take header view into account. While getItemAtPosition() will take care of
-	        // header view too, so the actual item returned from getItemAtPosition is one ahead of expected one.
-	        final Cursor src = (Cursor) mTaskAdapter.getItem(from);
-	        android.database.DatabaseUtils.dumpCurrentRow(src);
-	        long srcModified = src.getLong(ProjectionIndex.CREATED);
-	        final Uri srcUri = ContentUris.withAppendedId(TaskStore.CONTENT_URI, src.getLong(ProjectionIndex.ID));
-
-	        final Cursor dst = (Cursor) mTaskAdapter.getItem(to);
-	        android.database.DatabaseUtils.dumpCurrentRow(dst);
-	        long dstModified = dst.getLong(ProjectionIndex.CREATED);
-	        final Uri dstUri = ContentUris.withAppendedId(TaskStore.CONTENT_URI, dst.getLong(ProjectionIndex.ID));
-
-	        final ContentValues values = new ContentValues(1);
-	        values.put(TaskColumns.CREATED, dstModified);
-	        getContentResolver().update(srcUri, values, null, null);
-	        values.clear();
-	        values.put(TaskColumns.CREATED, srcModified);
-	        getContentResolver().update(dstUri, values, null, null);
-	    }
-        });
         mConnectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 
@@ -247,6 +207,42 @@ public class TodayActivity extends Activity {
 	super.onPause();
     }
     
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (mTaskAdapter == null) {
+            return;
+        }
+        final Cursor cursor = TaskStore.getTodayTasks(getContentResolver());
+        mTaskAdapter.changeCursor(cursor);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mTaskAdapter == null) {
+            return;
+        }
+        
+        final ArrayList<Long> modifieds = new ArrayList<Long>();
+        final Cursor cursor = mTaskAdapter.getCursor();
+        cursor.moveToFirst();
+        do {
+            modifieds.add(cursor.getLong(ProjectionIndex.CREATED));
+        } while (cursor.moveToNext());
+        ArrayList<Integer> reorderedList = mTaskAdapter.getCursorPositions();
+        for (int i = 0; i < reorderedList.size(); i++) {
+            // update reordered[pos] with cursor[index]
+            cursor.moveToPosition(reorderedList.get(i));
+            final Uri uri = ContentUris.withAppendedId(TaskStore.CONTENT_URI, cursor.getLong(ProjectionIndex.ID));
+            final ContentValues values = new ContentValues(1);
+            values.put(TaskColumns.CREATED, modifieds.get(i));
+            getContentResolver().update(uri, values, null, null);
+        }
+        
+        cursor.close();
+    }
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 	switch (keyCode) {
@@ -392,7 +388,7 @@ public class TodayActivity extends Activity {
 	overridePendingTransition(R.anim.activity_enter_in, R.anim.activity_enter_out);
     }
     
-    private class TaskAdapter extends CursorAdapter {
+    private class TaskAdapter extends DragSortCursorAdapter {
         public TaskAdapter(Context context, Cursor c) {
             super(context, c);
         }
